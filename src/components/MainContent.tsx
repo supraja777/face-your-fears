@@ -1,4 +1,5 @@
 import { UserProfile } from "../types/UserProfile";
+import ChallengeLogForm from "./ChallengeLogForm";
 import { LeftComponent } from "./LeftComponent";
 import MotivationComponent from "./MotivationComponent";
 // --- Right Component (30%) ---
@@ -24,10 +25,11 @@ const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainCont
       <LeftComponent user={user} selectedChallenge={selectedChallenge} setSelectedChallenge={setSelectedChallenge} />
       <div style={{ flex: '0 0 30%', borderLeft: '1px solid #e2e8f0' }}>
         {selectedChallenge && (
-          <div>Hello </div>
+          <ChallengeLogForm challengeName= {selectedChallenge.name}  streak={selectedChallenge.streak}/>
         )}
         {!selectedChallenge && (
-          <MotivationComponent />
+
+          <MotivationComponent/>
         )}
       </div>
     </main>

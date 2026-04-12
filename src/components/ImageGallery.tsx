@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChallengeInfo = () => {
+const ImageGallery = () => {
   // Mock data for gallery items
   const galleryItems = [1, 2, 3, 4, 5, 6];
 
@@ -47,4 +47,4 @@ const ChallengeInfo = () => {
   );
 };
 
-export default ChallengeInfo;
+export default ImageGallery;
