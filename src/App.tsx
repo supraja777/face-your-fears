@@ -1,84 +1,144 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './database/supabaseClient';
+import NavigationBar from './components/NavigationBar';
 
-interface UserProfile {
+// --- Types ---
+export interface UserProfile {
   username: string;
   full_name: string;
   avatar_url: string;
   curr_score: number;
 }
 
-function App() {
+// --- Left Component (70%) ---
+const LeftComponent = ({ user }: { user: UserProfile | null }) => (
+  <section style={{ 
+    flex: '0 0 70%', 
+    height: '100%', 
+    overflowY: 'auto', 
+    padding: '32px',
+    boxSizing: 'border-box'
+  }}>
+    <div style={{ 
+      backgroundColor: '#ffffff', 
+      padding: '40px', 
+      borderRadius: '24px', 
+      boxShadow: '0 4px 20px rgba(0,0,0,0.03)', 
+      minHeight: '85vh',
+      border: '1px solid #f1f5f9'
+    }}>
+      <h2 style={{ fontSize: '2rem', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
+        Workspace
+      </h2>
+      <p style={{ color: '#64748b', fontSize: '1.1rem' }}>
+        Welcome back, <span style={{ color: '#6366f1', fontWeight: '600' }}>{user?.full_name || 'Supraja'}</span>
+      </p>
+      
+      <div style={{ 
+        marginTop: '40px', 
+        height: '400px', 
+        backgroundColor: '#f8fafc', 
+        borderRadius: '20px', 
+        border: '2px dashed #e2e8f0',
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        color: '#94a3b8',
+        fontSize: '1.2rem'
+      }}>
+        Main App Content Area
+      </div>
+    </div>
+  </section>
+);
+
+// --- Right Component (30%) ---
+const RightComponent = () => {
+  const images = [
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400",
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400",
+    "https://images.unsplash.com/photo-1533167649158-6d508895b680?w=400",
+    "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400"
+  ];
+
+  return (
+    <aside style={{ 
+      flex: '0 0 30%', 
+      height: '100%',
+      backgroundColor: '#ffffff', 
+      borderLeft: '1px solid #e2e8f0', 
+      padding: '32px', 
+      overflowY: 'auto', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '24px',
+      boxSizing: 'border-box'
+    }}>
+      <h3 style={{ 
+        fontSize: '0.9rem', 
+        fontWeight: '700', 
+        color: '#475569', 
+        textTransform: 'uppercase', 
+        letterSpacing: '0.1em' 
+      }}>
+        Motivation
+      </h3>
+      {images.map((url, i) => (
+        <img 
+          key={i} 
+          src={url} 
+          alt="Inspiration" 
+          style={{ 
+            width: '100%', 
+            borderRadius: '16px', 
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            transition: 'transform 0.2s'
+          }} 
+        />
+      ))}
+    </aside>
+  );
+};
+
+// --- Main App Root ---
+export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    async function getData() {
-      const { data, error } = await supabase.rpc('get_user_details');
-      if (data && data.length > 0) {
-        setUser(data[0]);
+    async function loadData() {
+      try {
+        const { data, error } = await supabase.rpc('get_user_details');
+        if (error) throw error;
+        if (data && data.length > 0) setUser(data[0]);
+      } catch (err) {
+        console.error("Supabase error:", err);
       }
     }
-    getData();
+    loadData();
   }, []);
 
   return (
-    <div style={{ paddingTop: '80px', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
-      {/* --- FIXED TOP NAV --- */}
-      <nav style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '70px',
-        backgroundColor: '#ffffff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 30px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        zIndex: 1000,
-        fontFamily: 'sans-serif'
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100vh', 
+      width: '100vw', 
+      backgroundColor: '#f8fafc',
+      overflow: 'hidden' // Prevents global body scroll
+    }}>
+      <NavigationBar user={user} />
+
+      <main style={{ 
+        display: 'flex', 
+        flex: 1, 
+        marginTop: '70px', // Matches your Nav height
+        width: '100%',
+        justifyContent: 'flex-start', // Anchors everything from left to right
+        overflow: 'hidden' 
       }}>
-        {/* Left Side: App Logo/Name */}
-        <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#4F46E5' }}>
-          Face Your Fears 🚀
-        </div>
-
-        {/* Right Side: User Info */}
-        {user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{user.full_name}</div>
-              <div style={{ fontSize: '0.8rem', color: '#666' }}>Score: 
-                <span style={{ color: '#059669', fontWeight: 'bold', marginLeft: '4px' }}>
-                  {user.curr_score}
-                </span>
-              </div>
-            </div>
-            <img 
-              src={user.avatar_url} 
-              alt="Profile" 
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                border: '2px solid #4F46E5',
-                backgroundColor: '#eee'
-              }}
-            />
-          </div>
-        ) : (
-          <div style={{ fontSize: '0.9rem', color: '#999' }}>Loading...</div>
-        )}
-      </nav>
-
-      {/* --- MAIN CONTENT AREA --- */}
-      <main style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Ready to start?</h2>
-        <p>Your dashboard is active.</p>
+        <LeftComponent user={user} />
+        <RightComponent />
       </main>
     </div>
   );
 }
-
-export default App;
