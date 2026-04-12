@@ -86,6 +86,24 @@ async function run() {
     }
 }
 
+
+export async function getUserDetails() {
+    try {
+        // Calling the stored function we created in SQL
+        const result = await sql`SELECT * FROM get_user_details()`;
+        
+        if (result.length === 0) {
+            console.log("⚠️ No user profile found in the database.");
+            return null;
+        }
+
+        return result[0];
+    } catch (error) {
+        console.error("❌ Error fetching user details:", error);
+        throw error;
+    }
+}
+
 // This checks if the file is being run directly
 const isMain = process.argv[1]?.includes('profile_utils.ts') || process.argv[1]?.includes('tsx');
 
