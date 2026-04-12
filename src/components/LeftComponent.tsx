@@ -3,14 +3,14 @@ import ChallengesGrid from "./ChallengesGrid";
 
 export const LeftComponent = ({ user }: { user: UserProfile | null }) => {
   const challengeContent = [
-    { name: "Public Speaking" },
-    { name: "Cold Outreach" },
-    { name: "Networking Event" },
-    { name: "Live Coding" },
-    { name: "Skydiving" },
-    { name: "Deep Sea Diving" },
-    { name: "Heights" },
-    { name: "Spiders" }
+    { name: "Public Speaking", "streak": 150 },
+    { name: "Cold Outreach", "streak": 150 },
+    { name: "Networking Event", "streak": 150 },
+    { name: "Live Coding", "streak": 150 },
+    { name: "Skydiving", "streak": 150 },
+    { name: "Deep Sea Diving", "streak": 150 },
+    { name: "Heights", "streak": 150 },
+    { name: "Spiders", "streak": 150 }
   ];
 
   return (

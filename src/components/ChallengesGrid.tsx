@@ -2,6 +2,7 @@ import React from 'react';
 
 interface Challenge {
   name: string;
+  streak: number;
 }
 
 interface ChallengesGridProps {
@@ -12,19 +13,18 @@ const ChallengesGrid = ({ challenges }: ChallengesGridProps) => {
   return (
     <div style={{ 
       display: 'flex',
-      flexWrap: 'wrap', // Allows cards to drop to the next line
+      flexWrap: 'wrap',
       gap: '24px', 
       width: '100%',
-      marginTop: '40px',
       paddingBottom: '40px',
-      justifyContent: 'center' // This centers the last item if it's alone!
+      justifyContent: 'center' 
     }}>
       {challenges.map((challenge, index) => (
         <div 
           key={index}
           style={{
-            flex: '0 1 calc(50% - 12px)', // Takes exactly half width (minus half the gap)
-            minWidth: '300px', // Prevents cards from getting too skinny
+            flex: '0 1 calc(50% - 12px)',
+            minWidth: '300px',
             position: 'relative',
             backgroundColor: '#ffffff',
             padding: '32px',
@@ -46,6 +46,29 @@ const ChallengesGrid = ({ challenges }: ChallengesGridProps) => {
             e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.03)';
           }}
         >
+          {/* Streak Badge */}
+          <div style={{
+            position: 'absolute',
+            top: '24px',
+            right: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            backgroundColor: '#fff7ed',
+            padding: '6px 12px',
+            borderRadius: '12px',
+            border: '1px solid #ffedd5'
+          }}>
+            <span style={{ fontSize: '1rem' }}>🔥</span>
+            <span style={{ 
+              fontSize: '0.9rem', 
+              fontWeight: '700', 
+              color: '#ea580c' 
+            }}>
+              {challenge.streak}
+            </span>
+          </div>
+
           {/* Icon */}
           <div style={{ 
             width: '48px', height: '48px', 
@@ -53,10 +76,10 @@ const ChallengesGrid = ({ challenges }: ChallengesGridProps) => {
             borderRadius: '14px', display: 'flex', alignItems: 'center',
             justifyContent: 'center', fontSize: '1.4rem', marginBottom: '20px'
           }}>
-            <span>🔥</span>
+            <span>🎯</span>
           </div>
 
-          <h3 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1e293b', margin: '0 0 12px 0' }}>
+          <h3 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1e293b', margin: '0 0 12px 0', paddingRight: '60px' }}>
             {challenge.name}
           </h3>
 
@@ -65,10 +88,17 @@ const ChallengesGrid = ({ challenges }: ChallengesGridProps) => {
           </p>
 
           <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#6366f1', backgroundColor: '#f5f3ff', padding: '4px 12px', borderRadius: '99px' }}>
+            <span style={{ 
+              fontSize: '0.85rem', 
+              fontWeight: '600', 
+              color: '#6366f1', 
+              backgroundColor: '#f5f3ff', 
+              padding: '4px 12px', 
+              borderRadius: '99px' 
+            }}>
               +50 Points
             </span>
-            <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>Start →</span>
+            <span style={{ fontSize: '0.9rem', color: '#94a3b8', fontWeight: '500' }}>Start →</span>
           </div>
         </div>
       ))}
