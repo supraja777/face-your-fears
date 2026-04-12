@@ -3,7 +3,6 @@ import { supabase } from './database/supabaseClient';
 import NavigationBar from './components/NavigationBar';
 import MainContent from './components/MainContent';
 
-// --- Types ---
 export interface UserProfile {
   username: string;
   full_name: string;
@@ -11,10 +10,6 @@ export interface UserProfile {
   curr_score: number;
 }
 
-// --- Left Component (70%) ---
-
-
-// --- Main App Root ---
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
 
