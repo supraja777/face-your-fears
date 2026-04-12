@@ -25,7 +25,7 @@ const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainCont
       <LeftComponent user={user} selectedChallenge={selectedChallenge} setSelectedChallenge={setSelectedChallenge} />
       <div style={{ flex: '0 0 30%', borderLeft: '1px solid #e2e8f0' }}>
         {selectedChallenge && (
-          <ChallengeLogForm challengeName= {selectedChallenge.name}  streak={selectedChallenge.streak}/>
+          <ChallengeLogForm challengeName= {selectedChallenge.name}  streak={selectedChallenge.streak} challengeDescription = {selectedChallenge.description}/>
         )}
         {!selectedChallenge && (
 
