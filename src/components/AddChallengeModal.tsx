@@ -18,10 +18,15 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
+      // Pass the data back to LeftComponent
       onAdd({ name, description, difficulty });
+
+      // Reset local form state
       setName('');
       setDescription('');
       setDifficulty('M');
+
+      // Close the current modal
       onClose();
     }
   };
@@ -45,7 +50,7 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
         animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
         position: 'relative'
       }}>
-        
+
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🚀</div>
           <h3 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '1.8rem', fontWeight: '800' }}>
@@ -57,19 +62,19 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               The Challenge
             </label>
-            <input 
+            <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Public Speaking"
               style={{
                 padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9',
-                backgroundColor: '#f8fafc', outline: 'none', fontSize: '0.95rem', 
+                backgroundColor: '#f8fafc', outline: 'none', fontSize: '0.95rem',
                 fontWeight: '500', fontFamily: 'inherit', color: '#1e293b'
               }}
             />
@@ -79,7 +84,7 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
             <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Mission Objective
             </label>
-            <textarea 
+            <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Define what success looks like..."
@@ -120,7 +125,7 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
           <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
             <button type="button" onClick={onClose} style={{
               flex: 1, padding: '18px', borderRadius: '18px', border: 'none',
-              backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: '700', 
+              backgroundColor: '#f1f5f9', color: '#64748b', fontWeight: '700',
               cursor: 'pointer', fontFamily: 'inherit'
             }}>Abandon</button>
             <button type="submit" style={{
