@@ -2,16 +2,12 @@ import { useEffect, useState } from 'react';
 import { supabase } from './database/supabaseClient';
 import NavigationBar from './components/NavigationBar';
 import MainContent from './components/MainContent';
+import { UserProfile } from './types/UserProfile';
 
-export interface UserProfile {
-  username: string;
-  full_name: string;
-  avatar_url: string;
-  curr_score: number;
-}
 
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(false);
 
   useEffect(() => {
     async function loadData() {
@@ -44,7 +40,7 @@ export default function App() {
           MainContent needs to be a direct child of the 100vh flex container 
           so it can receive "flex: 1".
       */}
-      <MainContent user={user} />
+      <MainContent  user={user} selectedChallenge={selectedChallenge} setSelectedChallenge = {setSelectedChallenge}/>
     </div>
   );
 }

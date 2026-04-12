@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RightComponent = () => {
+const MotivationComponent = () => {
   const pics = [
     "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400",
     "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400",
@@ -69,4 +69,4 @@ const RightComponent = () => {
   );
 };
 
-export default RightComponent;
+export default MotivationComponent;

@@ -1,25 +1,35 @@
+import { UserProfile } from "../types/UserProfile";
 import { LeftComponent } from "./LeftComponent";
-import RightComponent from "./RightComponent";
-
+import MotivationComponent from "./MotivationComponent";
 // --- Right Component (30%) ---
 
 interface MainContentProps {
-  user: UserProfile | null;
+  user: UserProfile | null,
+  activeChallenge: Boolean | null
+  selectedChallenge: { name: string; streak: number }
+  setSelectedChallenge: (c: string | null) => void;
 }
 
-const MainContent = ({ user }: MainContentProps) => {
+const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainContentProps) => {
   return (
-    <main style={{ 
-      display: 'flex', 
-      flex: 1, 
-      marginTop: '70px', 
+    <main style={{
+      display: 'flex',
+      flex: 1,
+      marginTop: '70px',
       width: '100%',
-      justifyContent: 'flex-start', 
+      justifyContent: 'flex-start',
       overflow: 'hidden',
       boxSizing: 'border-box'
     }}>
-      <LeftComponent user={user} />
-      <RightComponent />
+      <LeftComponent user={user} selectedChallenge={selectedChallenge} setSelectedChallenge={setSelectedChallenge} />
+      <div style={{ flex: '0 0 30%', borderLeft: '1px solid #e2e8f0' }}>
+        {selectedChallenge && (
+          <div>Hello </div>
+        )}
+        {!selectedChallenge && (
+          <MotivationComponent />
+        )}
+      </div>
     </main>
   );
 };
