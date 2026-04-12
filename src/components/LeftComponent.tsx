@@ -3,6 +3,7 @@ import { UserProfile } from "../types/UserProfile";
 import ChallengesGrid from "./ChallengesGrid";
 import CongratulationsModal from "./CongratulationsModal";
 import ChallengeInfo from "./ChallengeInfo";
+import AddChallengeModal from './AddChallengeModal';
 
 export const LeftComponent = ({ user }: { user: UserProfile | null }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +22,8 @@ export const LeftComponent = ({ user }: { user: UserProfile | null }) => {
 
   return (
     <section style={{ flex: '0 0 70%', height: 'calc(100vh - 70px)', padding: '32px', boxSizing: 'border-box', overflow: 'hidden' }}>
-      <CongratulationsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      {/* <CongratulationsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} /> */}
+      <AddChallengeModal isOpen = {isModalOpen} onClose={() => setIsModalOpen(false)}/>
 
       <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', height: '100%', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column' }}>
         
