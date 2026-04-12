@@ -21,6 +21,36 @@ interface ChallengeData {
     challenge_points?: number;
 }
 
+export async function getChallengesByUserId(userId: string) {
+    if (!userId) {
+        throw new Error("User ID is required to fetch challenges.");
+    }
+
+    try {
+        const challenges = await sql`
+            SELECT 
+                id,
+                challenge_description,
+                streak,
+                photos,
+                tags,
+                challenge_points,
+                created_at,
+                updated_at
+            FROM public.challenges
+            WHERE user_id = ${userId}
+            ORDER BY created_at DESC
+        `;
+
+        console.log(`📂 Fetched ${challenges.length} challenges for user: ${userId}`);
+        console.log("Challenges ", challenges)
+        return challenges;
+    } catch (error) {
+        console.error("❌ Error fetching challenges:", error);
+        throw error;
+    }
+}
+
 /**
  * Inserts a new challenge entry into the database.
  */
@@ -98,5 +128,5 @@ async function runTest() {
 const isMain = process.argv[1]?.includes('challenge_utils.ts') || process.argv[1]?.includes('tsx');
 
 if (isMain) {
-    runTest();
+    getChallengesByUserId("4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa");
 }
