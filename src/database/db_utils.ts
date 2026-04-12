@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const runProfileSchema = () => runSchemaFile('Profile_Schema.sql');
+const runChallengeSchema = () => runSchemaFile('Challenge_Schema.sql')
 
 // Load variables from .env
 dotenv.config();
@@ -52,7 +53,8 @@ async function runSchemaFile(filename: string) {
 async function main() {
     console.log("🚀 Starting database deployment...");
     
-    await runProfileSchema();
+    // await runProfileSchema();
+    await runChallengeSchema();
 
     // Cleanly close the connection pool
     await sql.end();
