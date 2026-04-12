@@ -33,16 +33,15 @@ export default function App() {
       height: '100vh', 
       width: '100vw', 
       backgroundColor: '#f8fafc',
-      overflow: 'hidden' // Prevents global body scroll
+      overflow: 'hidden' 
     }}>
       <NavigationBar user={user} />
 
-      <div>
-        <MainContent 
-      user={user} 
-     
-    />
-      </div>
+      {/* FIX: Removed the extra wrapper div. 
+          MainContent needs to be a direct child of the 100vh flex container 
+          so it can receive "flex: 1".
+      */}
+      <MainContent user={user} />
     </div>
   );
 }
