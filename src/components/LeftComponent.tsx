@@ -1,17 +1,12 @@
 import { useState } from 'react';
+import { UserProfile } from "../types/UserProfile";
 import ChallengesGrid from "./ChallengesGrid";
 import CongratulationsModal from "./CongratulationsModal";
 import ChallengeInfo from "./ChallengeInfo";
 
-interface LeftProps {
-  user: { full_name: string } | null;
-  selectedChallenge: { name: string; streak: number };
-  setSelectedChallenge: (c: string | null) => void;
-}
-
-export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }: LeftProps) => {
+export const LeftComponent = ({ user }: { user: UserProfile | null }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
 
   const challengeContent = [
     // { name: "Public Speaking", streak: 150 },
