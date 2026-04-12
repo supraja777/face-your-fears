@@ -73,6 +73,19 @@ const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
             <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>
               {challenge.name}
             </h4>
+            <p style={{ 
+            margin: 0, 
+            fontSize: '0.9rem', 
+            color: '#64748b', 
+            lineHeight: '1.5',
+            display: '-webkit-box',
+            WebkitLineClamp: 2, // Limits to 2 lines
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            {challenge.description || "No objective set."}
+          </p>
           </div>
 
           <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -9,12 +9,12 @@ export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }:
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   
   const [challenges, setChallenges] = useState([
-    { name: "Cold Outreach", streak: 150 },
-    { name: "Networking Event", streak: 150 }
+    { name: "Cold Outreach", streak: 150, description: "Cold Outreach desc" },
+    { name: "Networking Event", streak: 150, description: "Networking Event Desc" }
   ]);
 
   const handleAddChallenge = (newChallengeData: { name: string; description: string; difficulty: string }) => {
-    const newEntry = { name: newChallengeData.name, streak: 0 };
+    const newEntry = { name: newChallengeData.name, streak: 0, description : "" };
     
     // 1. Update the list
     setChallenges(prev => [newEntry, ...prev]);

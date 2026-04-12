@@ -1,4 +1,5 @@
 import React from 'react';
+import ImageGallery from './ImageGallery';
 
 interface Challenge {
   name: string;
@@ -99,7 +100,8 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
       </div>
 
       {/* 3. Evidence Gallery */}
-      <h4 style={{ margin: '0 0 16px 0', color: '#0f172a', fontWeight: '800', fontSize: '1.1rem' }}>
+      <ImageGallery/>
+      {/* <h4 style={{ margin: '0 0 16px 0', color: '#0f172a', fontWeight: '800', fontSize: '1.1rem' }}>
         Evidence Gallery
       </h4>
       
@@ -130,13 +132,9 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
             📸 Log #{item}
           </div>
         ))}
-      </div>
+      </div> */}
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-      `}</style>
+     
     </div>
   );
 };
