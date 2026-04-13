@@ -3,7 +3,7 @@ import ChallengesGrid from "./ChallengesGrid";
 import CongratulationsModal from "./CongratulationsModal";
 import ChallengeInfo from "./ChallengeInfo";
 import AddChallengeModal from "./AddChallengeModal";
-import { getChallengesByUserId } from "../database/challenge_utils"; // Import your utility
+import { createChallenge, getChallengesByUserId } from "../database/challenge_utils"; // Import your utility
 
 interface LeftProps {
   challenges: any[];
@@ -24,17 +24,49 @@ export const LeftComponent = ({ challenges, user, selectedChallenge, setSelected
     fetchChallenges("45a43e83-d65b-4dfc-af7a-821259632c52");
   }, [user]);
 
-  const handleAddChallenge = (newChallengeData: { name: string; description: string; difficulty: string }) => {
-    // Note: In a real app, you would call createChallenge() utility here, 
-    // then re-fetch or update state with the returned DB object.
-    const newEntry = { 
-      challenge_description: newChallengeData.description, 
-      streak: 0, 
-      tags: [newChallengeData.difficulty] 
-    };
-    
-  
-    setIsSuccessModalOpen(true);
+    const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
+    try {
+      // 1. Map difficulty strings to point values
+      const pointMapping: Record<string, number> = {
+        'xs': 10,
+        's': 20,
+        'm': 50,
+        'l': 100,
+        'xl': 200
+      };
+
+      // Normalize the input difficulty to lowercase to match the mapping
+      const difficultyKey = newChallengeData.difficulty.toLowerCase();
+      const points = pointMapping[difficultyKey] || 0;
+
+      // 2. Prepare the data for Supabase
+      const newChallengePayload = {
+        user_id: "4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa", // Use your active User ID
+        challenge_description: newChallengeData.description,
+        streak: 0,
+        photos: [], // Start with an empty gallery
+        tags: [newChallengeData.difficulty], // Store ['XS'], ['M'], etc.
+        challenge_points: points
+      };
+
+      // 3. Call the Supabase utility
+      // This will return the new database record including the generated ID
+      const createdChallenge = await createChallenge(newChallengePayload);
+
+      if (createdChallenge) {
+        console.log("New Challenge Created with ID:", createdChallenge.id);
+        
+        // 4. Refresh your UI list to show the new challenge
+        // This ensures your "Left Component" list stays in sync
+        await fetchChallenges("4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa");
+
+        // 5. Success UI
+        setIsSuccessModalOpen(true);
+      }
+    } catch (error) {
+      console.error("Failed to create challenge:", error);
+      // Optionally add a notification for the user here
+    }
   };
 
   return (
