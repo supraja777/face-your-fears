@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { analyzeEvidenceWithGroq } from '../utils/groq_api_utils';
 import CongratulationsModal from './CongratulationsModal';
 import { isValidPhoto } from '../utils/verify_image';
+import { addPhotoToChallenge } from '../database/challenge_utils';
 
 interface EvidenceItem {
   url: string;
@@ -23,7 +24,6 @@ const ChallengeLogForm = ({
   challengeName, 
   streak, 
   description, 
-  setEvidenceGallery, 
   refreshChallenges 
 }: ChallengeLogFormProps) => {
   const [notes, setNotes] = useState('');
@@ -86,10 +86,9 @@ const ChallengeLogForm = ({
         };
 
         // 3. TODO: Add your DB update call here
-        // await db.challenges.update(challengeId, { evidence: newEntry, streak: streak + 1 });
-
-        // 4. Update local gallery state
-        setEvidenceGallery(prev => [newEntry, ...prev]);
+        
+        const isSaved = await addPhotoToChallenge(challengeId, selectedImage, notes)
+        console.log("Is saved????", isSaved)
 
         // 5. Re-fetch all challenges to update the global UI/Streak count
         await refreshChallenges();

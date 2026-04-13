@@ -23,9 +23,7 @@ const MainContent = ({ challenges, fetchChallenges, user, selectedChallenge, set
   const [evidenceGallery, setEvidenceGallery] = useState<any[]>([]);
 
   const handleRefreshChallenges = async () => {
-    
       await onRefresh();
-    
   };
 
   return (

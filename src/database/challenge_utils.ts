@@ -82,6 +82,7 @@ export const getChallengeData = async (userId) => {
 };
 
 export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
+  console.log("Adding photo to dbbbbbbbbbbbbbbbbbb ", challengeId, newPhotoUrl)
   try {
     // 1. Fetch current photos first (if your DB doesn't support atomic append)
     const { data: challenge } = await supabase
@@ -92,8 +93,6 @@ export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNo
 
     const updatedPhotos = [...(challenge.photos || []), {
       url: newPhotoUrl,
-      notes: reflectionNotes,
-      timestamp: new Date().toISOString()
     }];
 
     // 2. Update the record
@@ -102,7 +101,6 @@ export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNo
       .update({ 
         photos: updatedPhotos,
         streak: challenge.streak + 1, // Usually you increment streak here too
-        last_logged: new Date().toISOString()
       })
       .eq('id', challengeId);
 
