@@ -81,6 +81,33 @@ export const getChallengeData = async (userId) => {
   }
 };
 
+export const uploadToCloudinary = async (base64Image: string): Promise<string | null> => {
+  const cloudName = CLOUD_NAME; // Replace with your Cloud Name
+  const uploadPreset = PRESET_NAME; // Replace with your Unsigned Preset
+
+  try {
+    // Cloudinary expects the full Data URI (with the 'data:image/jpeg;base64,' prefix)
+    const formData = new FormData();
+    formData.append('file', base64Image);
+    formData.append('upload_preset', uploadPreset);
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Cloudinary upload failed');
+    }
+
+    const data = await response.json();
+    return data.secure_url; // This is the short URL (e.g. https://res.cloudinary.com/...)
+  } catch (error) {
+    console.error("Cloudinary Error:", error);
+    return null;
+  }
+};
+
 export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
   console.log("Adding photo to dbbbbbbbbbbbbbbbbbb ", challengeId, newPhotoUrl)
   try {
@@ -100,7 +127,7 @@ export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNo
       .from('challenges')
       .update({ 
         photos: updatedPhotos,
-        streak: challenge.streak + 1, // Usually you increment streak here too
+        streak: challenge.streak + 1, // Usually you increment streak here to
       })
       .eq('id', challengeId);
 

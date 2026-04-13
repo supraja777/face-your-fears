@@ -15,11 +15,6 @@ interface ChallengesGridProps {
 }
 
 const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
-  console.log("In challenge grid ", challenges);
-
-   useEffect(() => {
-     
-    }, [challenges]);
 
   return (
     <div style={{

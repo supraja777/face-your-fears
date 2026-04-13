@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { analyzeEvidenceWithGroq } from '../utils/groq_api_utils';
 import CongratulationsModal from './CongratulationsModal';
 import { isValidPhoto } from '../utils/verify_image';
-import { addPhotoToChallenge } from '../database/challenge_utils';
+import { addPhotoToChallenge, uploadToCloudinary } from '../database/challenge_utils';
 
 interface EvidenceItem {
   url: string;
@@ -86,20 +86,33 @@ const ChallengeLogForm = ({
         };
 
         // 3. TODO: Add your DB update call here
-        
-        const isSaved = await addPhotoToChallenge(challengeId, selectedImage, notes)
-        console.log("Is saved????", isSaved)
 
-        // 5. Re-fetch all challenges to update the global UI/Streak count
-        await refreshChallenges();
+        const cloudinaryUrl = await uploadToCloudinary(selectedImage);
 
-        setNotification({ 
-          show: true, 
-          message: "Analysis done! Photo is valid ✨", 
-          isSuccess: true 
-        });
+        if (cloudinaryUrl) {
+            const isSaved = await addPhotoToChallenge(challengeId, cloudinaryUrl, notes)
+            console.log("Is saved????", isSaved)
+
+            if (isSaved) {
+    
+                await refreshChallenges();
+
+                setNotification({ 
+                  show: true, 
+                  message: "Analysis done! Photo is valid ✨ ! Synced to cloud!", 
+                  isSuccess: true 
+                });
+
+                setNotes('')
+                setSelectedImage(null)
+                
+                setTimeout(() => setShowModal(true), 1000);
+            }
+
+          
+        }
         
-        setTimeout(() => setShowModal(true), 1000);
+
       } else {
         setNotification({ 
           show: true, 
