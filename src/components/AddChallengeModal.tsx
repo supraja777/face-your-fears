@@ -17,7 +17,7 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
+    if (description.trim()) {
       // Pass the data back to LeftComponent
       onAdd({ name, description, difficulty });
 
@@ -63,7 +63,7 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               The Challenge
             </label>
@@ -78,11 +78,11 @@ const AddChallengeModal = ({ isOpen, onClose, onAdd }: AddChallengeModalProps) =
                 fontWeight: '500', fontFamily: 'inherit', color: '#1e293b'
               }}
             />
-          </div>
+          </div> */}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Mission Objective
+              Challenge
             </label>
             <textarea
               value={description}
