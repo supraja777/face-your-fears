@@ -67,6 +67,8 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         .eq('password', password)
         .maybeSingle();
 
+      console.log("what is the data??  ", data)
+
       if (data) {
         onLoginSuccess(data);
       } else {

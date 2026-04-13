@@ -1,15 +1,24 @@
 import React from 'react';
+import mot2 from '../assets/mot2.jpg'
+import mot1 from '../assets/mot1.jfif'
+import mot3 from '../assets/mot3.jpg'
 
 const MotivationComponent = () => {
+  // const pics = [
+  //   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400",
+  //   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400",
+  //   "https://images.unsplash.com/photo-1533167649158-6d508895b680?w=400",
+  //   "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400",
+  //   "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400",
+  //   "https://images.unsplash.com/photo-1518005020250-6e5949ad09e4?w=400", // Extra pics to ensure scroll
+  //   "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400"
+  // ];
+
   const pics = [
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400",
-    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400",
-    "https://images.unsplash.com/photo-1533167649158-6d508895b680?w=400",
-    "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400",
-    "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400",
-    "https://images.unsplash.com/photo-1518005020250-6e5949ad09e4?w=400", // Extra pics to ensure scroll
-    "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400"
-  ];
+    mot2,
+    mot1,
+    mot3
+  ]
 
   return (
     <aside style={{ 
@@ -24,7 +33,7 @@ const MotivationComponent = () => {
     }}>
       {/* Header - Fixed at top */}
       <div style={{ padding: '32px 32px 20px 32px' }}>
-        <h3 style={{ 
+        {/* <h3 style={{ 
           fontSize: '0.8rem', 
           fontWeight: '800', 
           color: '#94a3b8', 
@@ -32,7 +41,7 @@ const MotivationComponent = () => {
           letterSpacing: '0.15em'
         }}>
           Motivation
-        </h3>
+        </h3> */}
       </div>
 
       {/* The Scrollable Box */}
