@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 export const runProfileSchema = () => runSchemaFile('Profile_Schema.sql');
 const runChallengeSchema = () => runSchemaFile('Challenge_Schema.sql')
 const userCredSchema = () => runSchemaFile('User_Schema.sql')
+const profileChallengeSchema = () => runSchemaFile('PROFILE_CHALLENGE_SCHEMA.sql')
 
 // Load variables from .env
 dotenv.config();
@@ -56,7 +57,8 @@ async function main() {
     
     // await runProfileSchema();
     // await runChallengeSchema();
-    await userCredSchema()
+    // await userCredSchema()
+    await profileChallengeSchema();
 
     // Cleanly close the connection pool
     await sql.end();

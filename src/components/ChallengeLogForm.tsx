@@ -10,6 +10,7 @@ interface EvidenceItem {
 }
 
 interface ChallengeLogFormProps {
+  selectedChallengePhotos: [] | null,
   challengeId: string | null;
   challengeName: string | null;
   streak: number | null;
@@ -19,6 +20,7 @@ interface ChallengeLogFormProps {
 }
 
 const ChallengeLogForm = ({ 
+  selectedChallengePhotos,
   challengeId, 
   streak, 
   description, 

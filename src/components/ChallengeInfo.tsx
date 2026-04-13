@@ -11,11 +11,12 @@ interface Challenge {
 }
 
 interface ChallengeInfoProps {
+  selectedChallengePhotos: [] 
   challenge: Challenge;
   onBack: () => void;
 }
 
-const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
+const ChallengeInfo = ({ selectedChallengePhotos, challenge, onBack }: ChallengeInfoProps) => {
   // Extracting difficulty from tags if it exists
   const difficulty = challenge.tags?.length ? challenge.tags[0] : 'Standard';
   // Calculate total XP: streak * base points
@@ -220,8 +221,9 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           paddingBottom: '20px'
         }}>
           <ImageGallery 
+         
             photos={challenge.photos} 
-            key={challenge.photos?.length || 0} 
+            key={`gallery-${challenge.id}-${challenge.photos?.length || 0}`}
           />
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from './database/supabase';
 
 interface AuthProps {
-  onLoginSuccess: (userData: { id: string; username: string }) => void;
+  onLoginSuccess: (userData: any) => void;
 }
 
 export default function Auth({ onLoginSuccess }: AuthProps) {
@@ -13,39 +13,37 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-
+  const [fullName, setFullName] = useState(''); // New field
+  const [avatarUrl, setAvatarUrl] = useState(''); // New field
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
     if (password !== confirmPassword) return alert("Passwords do not match!");
     if (username.length < 3) return alert("Username must be at least 3 characters");
+    if (!fullName) return alert("Full Name is required");
 
     setLoading(true);
     try {
-      // 1. Check for existing username
-      const { data: existing } = await supabase
-        .from('user_cred')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle();
-
-      if (existing) {
-        alert("Username already taken!");
-        setLoading(false);
-        return;
-      }
-
-      // 2. Insert new user
+      // Single Insert into the brand new profiles table
       const { data, error } = await supabase
-        .from('user_cred')
-        .insert([{ username, password }])
+        .from('profiles')
+        .insert([{ 
+          username, 
+          password, 
+          full_name: fullName, 
+          avatar_url: avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}` // Default avatar
+        }])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') throw new Error("Username already taken!");
+        throw error;
+      }
 
-      alert("Account created! Now you can login.");
+      alert("Account created successfully!");
       setIsLoginView(true);
       setPassword('');
       setConfirmPassword('');
@@ -61,21 +59,21 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
     setLoading(true);
 
     try {
+      // Select everything from profiles where username and password match
       const { data, error } = await supabase
-        .from('user_cred')
-        .select('id, username')
+        .from('profiles')
+        .select('*')
         .eq('username', username)
         .eq('password', password)
         .maybeSingle();
 
       if (data) {
-        // Pass the user data back up to ActualProject.tsx
-        onLoginSuccess({ id: data.id, username: data.username });
+        onLoginSuccess(data);
       } else {
         alert("Invalid username or password");
       }
     } catch (err: any) {
-      alert("Login failed");
+      alert("Login failed. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -92,6 +90,8 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
         </p>
 
         <form onSubmit={isLoginView ? handleLogin : handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          {/* Username is used in both Login and Register */}
           <input 
             required
             placeholder="Username" 
@@ -99,6 +99,26 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
             onChange={(e) => setUsername(e.target.value)} 
             style={inputStyle}
           />
+
+          {/* Registration-only fields */}
+          {!isLoginView && (
+            <>
+              <input 
+                required
+                placeholder="Full Name" 
+                value={fullName} 
+                onChange={(e) => setFullName(e.target.value)} 
+                style={inputStyle}
+              />
+              <input 
+                placeholder="Avatar URL (Optional)" 
+                value={avatarUrl} 
+                onChange={(e) => setAvatarUrl(e.target.value)} 
+                style={inputStyle}
+              />
+            </>
+          )}
+
           <input 
             required
             type="password" 
@@ -135,7 +155,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
   );
 }
 
-// --- STYLES (Keep them exactly as they were) ---
+// --- STYLES ---
 const containerStyle: React.CSSProperties = {
   minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', fontFamily: "'Inter', sans-serif"
 };

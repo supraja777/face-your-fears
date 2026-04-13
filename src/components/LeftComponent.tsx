@@ -6,6 +6,7 @@ import AddChallengeModal from "./AddChallengeModal";
 import { createChallenge } from "../database/challenge_utils";
 
 interface LeftProps {
+  selectedChallengePhotos: [],
   challenges: any[];
   user: any;
   selectedChallenge: any;
@@ -13,7 +14,7 @@ interface LeftProps {
   fetchChallenges: (userId: string) => void;
 }
 
-export const LeftComponent = ({ challenges, user, selectedChallenge, setSelectedChallenge, fetchChallenges }: LeftProps) => {
+export const LeftComponent = ({ selectedChallengePhotos, challenges, user, selectedChallenge, setSelectedChallenge, fetchChallenges }: LeftProps) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -176,6 +177,7 @@ const handleAddChallenge = async (newChallengeData: { name: string; description:
             </div>
           ) : selectedChallenge ? (
             <ChallengeInfo 
+              selectedChallengePhotos = {selectedChallengePhotos}
               challenge={selectedChallenge} 
               onBack={() => setSelectedChallenge(null)} 
             />

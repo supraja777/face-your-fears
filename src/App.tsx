@@ -13,6 +13,7 @@ export default function App({ user, onLogout }: { user: any, onLogout: () => voi
   const [selectedChallenge, setSelectedChallenge] = useState<any>(false);
   const [loading, setLoading] = useState(true);
   const[challenges, setChallenges] = useState([])
+  
 
   const fetchChallenges = async (userId?: string) => {
     
@@ -23,10 +24,12 @@ export default function App({ user, onLogout }: { user: any, onLogout: () => voi
             const data = await getChallengesByUserId(userId);
             console.log("IN left challenges data is ", data)
             setChallenges(data);
+            
             if (selectedChallenge.id) {
               const updatedTarget = data.find(c => c.id === selectedChallenge.id);
               if (updatedTarget) {
                 setSelectedChallenge({ ...updatedTarget });
+              
               }
             }
           } catch (error) {
