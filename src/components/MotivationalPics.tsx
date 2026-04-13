@@ -1,126 +1,157 @@
-import { useEffect, useState } from 'react';
-import { supabase } from './database/supabaseClient';
+import { useState, useEffect } from 'react';
+import Auth from './Auth';
+import App from './App';
+import FeaturesModal from './components/FeaturesModal';
+import projectIcon from './assets/image.png'; 
 
-interface UserProfile {
-  username: string;
-  full_name: string;
-  avatar_url: string;
-  curr_score: number;
-}
-
-function App() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-
-  // Motivational images array
-  const motivationalPics = [
-    "http://googleusercontent.com/image_collection/image_retrieval/9215018691526197991_0",
-    "http://googleusercontent.com/image_collection/image_retrieval/9215018691526197991_1",
-    "http://googleusercontent.com/image_collection/image_retrieval/9215018691526197991_2",
-    "http://googleusercontent.com/image_collection/image_retrieval/9215018691526197991_3",
-    "http://googleusercontent.com/image_collection/image_retrieval/9215018691526197991_4"
-  ];
+export default function ActualProject() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
 
   useEffect(() => {
-    async function getData() {
-      const { data, error } = await supabase.rpc('get_user_details');
-      if (data && data.length > 0) {
-        setUser(data[0]);
+    const savedUser = localStorage.getItem('app_user');
+    if (savedUser && savedUser !== "undefined") {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error("Error parsing user", e);
+        localStorage.removeItem('app_user');
       }
     }
-    getData();
+    setLoading(false);
   }, []);
+
+  const handleLoginSuccess = (userData: any) => {
+    setUser(userData);
+    localStorage.setItem('app_user', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('app_user');
+    setUser(null);
+  };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
+      position: 'relative', 
+      width: '100vw', 
       height: '100vh', 
-      fontFamily: 'sans-serif',
-      backgroundColor: '#f3f4f6' 
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      backgroundColor: '#f8fafc',
+      overflow: 'hidden'
     }}>
       
-      {/* --- FIXED TOP NAV --- */}
+      {/* --- TOP NAVIGATION BAR --- */}
       <nav style={{
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
-        height: '70px',
-        backgroundColor: '#ffffff',
+        height: '80px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 30px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        zIndex: 1000
+        zIndex: 10002,
+        // Using background color to match your screenshot's clean look
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid #f1f5f9'
       }}>
-        <div style={{ fontWeight: 'bold', fontSize: '1.4rem', color: '#4F46E5' }}>
-          Face Your Fears 🚀
-        </div>
-
-        {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{user.full_name}</div>
-              <div style={{ fontSize: '0.8rem', color: '#666' }}>
-                Score: <span style={{ color: '#059669', fontWeight: 'bold' }}>{user.curr_score}</span>
-              </div>
-            </div>
-            <img src={user.avatar_url} alt="Profile" style={{ width: '40px', borderRadius: '50%', border: '2px solid #4F46E5' }} />
-          </div>
-        )}
-      </nav>
-
-      {/* --- MAIN LAYOUT (Content + Sidebar) --- */}
-      <div style={{ display: 'flex', flex: 1, marginTop: '70px' }}>
         
-        {/* LEFT: MAIN CONTENT (80%) */}
-        <main style={{ flex: 0.8, padding: '40px', overflowY: 'auto' }}>
-          <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-            <h1>Welcome back, {user?.full_name.split(' ')[0] || 'User'}!</h1>
-            <p style={{ color: '#4b5563', fontSize: '1.1rem' }}>
-              Your progress is being tracked. Keep pushing forward!
-            </p>
-          </div>
-        </main>
-
-        {/* RIGHT: MOTIVATION SIDEBAR (20%) */}
-        <aside style={{ 
-          flex: 0.2, 
-          backgroundColor: '#ffffff', 
-          borderLeft: '1px solid #e5e7eb',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          overflowY: 'auto',
-          maxHeight: 'calc(100vh - 70px)'
-        }}>
-          <h3 style={{ fontSize: '1rem', color: '#374151', textAlign: 'center', marginBottom: '10px' }}>
-            Daily Inspiration
-          </h3>
-          
-          {motivationalPics.map((pic, index) => (
-            <div key={index} style={{
-              width: '100%',
-              borderRadius: '12px',
+        {/* 1. LEFT SECTION (Features Button) */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+          <button 
+            onClick={() => setIsFeaturesOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '6px 16px 6px 6px',
+              borderRadius: '100px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)';
+            }}
+          >
+            {/* Logo Thumbnail */}
+            <div style={{ 
+              width: '34px', 
+              height: '34px', 
+              borderRadius: '50%', 
               overflow: 'hidden',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              transition: 'transform 0.2s',
-              cursor: 'pointer'
+              backgroundColor: '#f1f5f9',
+              border: '1px solid #f1f5f9'
             }}>
               <img 
-                src={pic} 
-                alt={`Motivation ${index + 1}`} 
-                style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }} 
+                src={projectIcon} 
+                alt="Logo" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
             </div>
-          ))}
-        </aside>
 
+            {/* Label */}
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontWeight: '800', fontSize: '0.85rem', color: '#1e293b', lineHeight: 1 }}>
+                Features
+              </div>
+              <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold', marginTop: '2px' }}>
+                V2.0
+              </div>
+            </div>
+          </button>
+        </div>
+
+        {/* 2. CENTER SECTION (Centered Title) */}
+        <div style={{ 
+          flex: 2, 
+          textAlign: 'center'
+        }}>
+          <h1 style={{ 
+            margin: 0, 
+            fontWeight: '900', 
+            fontSize: '1.6rem', 
+            color: '#4F46E5',
+            letterSpacing: '-0.03em' 
+          }}>
+            Face Your Fears! 🚀
+          </h1>
+        </div>
+
+        {/* 3. RIGHT SECTION (Spacer or Profile) */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            {/* If you add a logout or profile button later, it goes here */}
+        </div>
+      </nav>
+
+      {/* --- THE FEATURES MODAL --- */}
+      <FeaturesModal 
+        isOpen={isFeaturesOpen} 
+        onClose={() => setIsFeaturesOpen(false)} 
+      />
+
+      {/* --- VIEW ROUTER --- */}
+      <div style={{ marginTop: '80px', height: 'calc(100vh - 80px)' }}>
+        {user ? (
+          <App user={user} onLogout={handleLogout} />
+        ) : (
+          <Auth onLoginSuccess={handleLoginSuccess} />
+        )}
       </div>
+      
     </div>
   );
 }
-
-export default App;

@@ -117,6 +117,11 @@ const ChallengeLogForm = ({
                 message: "Duplicate photo identified! Upload a new one.", 
                 isSuccess: false 
               });
+            setSelectedImage(null);
+            setBase64Image(null);
+            setImageFile(null);
+            setNotes('');
+            setIsAuditing(false);
               return;
           }
       
@@ -174,15 +179,28 @@ const ChallengeLogForm = ({
     <>
       {/* Toast Notification */}
       <div style={{
-        position: 'fixed', top: '30px', right: '30px', zIndex: 10000,
-        backgroundColor: notification.isSuccess ? '#10b981' : '#f87171', color: 'white',
-        padding: '16px 24px', borderRadius: '20px', fontWeight: '700', fontSize: '0.9rem',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '10px',
-        transform: notification.show ? 'translateX(0)' : 'translateX(120%)',
-        transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      }}>
-        <span>{notification.isSuccess ? '✅' : '❌'}</span> {notification.message}
-      </div>
+        position: 'fixed', 
+        bottom: '40px', // Moved to bottom
+        right: '40px', 
+        zIndex: 10010, // Higher than everything else
+        backgroundColor: notification.isSuccess ? '#10b981' : '#f87171', 
+        color: 'white',
+        padding: '16px 28px', 
+        borderRadius: '24px', 
+        fontWeight: '800', 
+        fontSize: '0.95rem',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.2)', 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px',
+        pointerEvents: 'none', // Critical so it doesn't block clicks when hidden
+        transform: notification.show ? 'translateY(0) scale(1)' : 'translateY(150%) scale(0.9)',
+        opacity: notification.show ? 1 : 0,
+        transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+    }}>
+        <span style={{ fontSize: '1.2rem' }}>{notification.isSuccess ? '✅' : '❌'}</span> 
+        {notification.message}
+    </div>
 
       {showModal && <CongratulationsModal isOpen={showModal} onClose={() => setShowModal(false)} />}
 
