@@ -116,7 +116,7 @@ export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNo
     // 1. Fetch current photos AND current streak
     const { data: challenge, error: fetchError } = await supabase
       .from('challenges')
-      .select('photos, streak') // Added streak here so we can increment it
+      .select('photos, streak')
       .eq('id', challengeId)
       .single();
 
