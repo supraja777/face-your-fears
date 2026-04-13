@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CongratulationsModal from './CongratulationsModal';
-import { isValidPhoto } from '../utils/verify_image'; // This should now handle the date check
+import { isValidPhoto } from '../utils/verify_image';
 import { addPhotoToChallenge, uploadToCloudinary } from '../database/challenge_utils';
 
 interface EvidenceItem {
@@ -10,18 +10,18 @@ interface EvidenceItem {
 }
 
 interface ChallengeLogFormProps {
-  selectedChallenge: [] | null,
+  selectedChallenge: any;
+  selectedChallengePhotos?: any[];
   challengeId: string | null;
   challengeName: string | null;
   streak: number | null;
   description: string | null;
-  setEvidenceGallery: React.Dispatch<React.SetStateAction<EvidenceItem[]>>;
+  setEvidenceGallery?: React.Dispatch<React.SetStateAction<EvidenceItem[]>>;
   refreshChallenges: () => Promise<void>;
 }
 
 const ChallengeLogForm = ({ 
   selectedChallenge,
-  selectedChallengePhotos,
   challengeId, 
   streak, 
   description, 
@@ -32,7 +32,7 @@ const ChallengeLogForm = ({
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null); // Fixed type
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [notification, setNotification] = useState<{ show: boolean; message: string; isSuccess: boolean }>({ 
     show: false, 
     message: '', 
@@ -49,18 +49,36 @@ const ChallengeLogForm = ({
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImageFile(file); // Store the actual file for date validation
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const scale = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scale;
+          
+          // --- SMART DIMENSIONS LOGIC ---
+          const MAX_SIZE = 1200; 
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width;
+              width = MAX_SIZE;
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height;
+              height = MAX_SIZE;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+          ctx?.drawImage(img, 0, 0, width, height);
+          
           const compressed = canvas.toDataURL('image/jpeg', 0.8);
           setSelectedImage(compressed);
           setBase64Image(compressed.split(',')[1]);
@@ -72,7 +90,6 @@ const ChallengeLogForm = ({
   };
 
   const handleSaveEntry = async () => {
-    // Basic validation before starting
     if (!base64Image || !selectedImage || !challengeId || !imageFile) {
       setNotification({
         show: true,
@@ -85,31 +102,19 @@ const ChallengeLogForm = ({
     setIsAuditing(true);
     
     try {
-      // 1. DATE & AI CONTENT VERIFICATION
-      // Ensure isValidPhoto accepts (File, string, string)
       const result = await isValidPhoto(imageFile, base64Image, description || "Task");
 
-      console.log("Getting resulr?? ", result)
-
       if (result.verified) {
-        // 2. CLOUDINARY UPLOAD
         const {cloudinaryUrl, etag} = await uploadToCloudinary(selectedImage);
 
-        console.log("Cloudinary url ", cloudinaryUrl)
-        console.log("ETAG ", etag)
-
         if (cloudinaryUrl) {
-         const isDuplicate = selectedChallenge.photos?.some((photoEntry: any) => {
-          let parsed = photoEntry;
-          console.log("What is paresed ", parsed)
-          // If your photos are stored as strings in the DB, parse them first
-          if (typeof photoEntry === 'string') {
-            try { parsed = JSON.parse(photoEntry); } catch (e) { return false; }
-          }
-          
-          return parsed.etag === etag;
-        });
-          console.log("No duplicate savinf")
+          const isDuplicate = selectedChallenge.photos?.some((photoEntry: any) => {
+            let parsed = photoEntry;
+            if (typeof photoEntry === 'string') {
+              try { parsed = JSON.parse(photoEntry); } catch (e) { return false; }
+            }
+            return parsed.etag === etag;
+          });
 
           if (isDuplicate) {
              setNotification({ 
@@ -122,14 +127,12 @@ const ChallengeLogForm = ({
             setImageFile(null);
             setNotes('');
             setIsAuditing(false);
-              return;
+            return;
           }
       
-          // 3. DATABASE SAVE
           const isSaved = await addPhotoToChallenge(challengeId, etag, cloudinaryUrl, notes);
 
           if (isSaved) {
-            
             await refreshChallenges();
             setNotification({ 
               show: true, 
@@ -137,7 +140,6 @@ const ChallengeLogForm = ({
               isSuccess: true 
             });
             
-            // Reset Form
             setSelectedImage(null);
             setBase64Image(null);
             setImageFile(null);
@@ -148,17 +150,12 @@ const ChallengeLogForm = ({
           }
         }
       } else {
-        // Verification failed (Either wrong date or AI didn't recognize content)
         setNotification({ 
           show: true, 
-          message: result.message, // Shows "Please upload today's photo" or AI error
+          message: result.message, 
           isSuccess: false 
         });
-         setSelectedImage(null);
-            setBase64Image(null);
-            setImageFile(null);
-            setNotes('');
-            setIsAuditing(false);
+        setIsAuditing(false);
       }
     } catch (error) {
       console.error("Save process failed:", error);
@@ -167,11 +164,7 @@ const ChallengeLogForm = ({
         message: "Network error. Please try again.", 
         isSuccess: false 
       });
-       setSelectedImage(null);
-            setBase64Image(null);
-            setImageFile(null);
-            setNotes('');
-            setIsAuditing(false);
+      setIsAuditing(false);
     }
   };
 
@@ -180,9 +173,9 @@ const ChallengeLogForm = ({
       {/* Toast Notification */}
       <div style={{
         position: 'fixed', 
-        bottom: '40px', // Moved to bottom
+        bottom: '40px', 
         right: '40px', 
-        zIndex: 10010, // Higher than everything else
+        zIndex: 10010, 
         backgroundColor: notification.isSuccess ? '#10b981' : '#f87171', 
         color: 'white',
         padding: '16px 28px', 
@@ -193,14 +186,14 @@ const ChallengeLogForm = ({
         display: 'flex', 
         alignItems: 'center', 
         gap: '12px',
-        pointerEvents: 'none', // Critical so it doesn't block clicks when hidden
+        pointerEvents: 'none',
         transform: notification.show ? 'translateY(0) scale(1)' : 'translateY(150%) scale(0.9)',
         opacity: notification.show ? 1 : 0,
         transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-    }}>
+      }}>
         <span style={{ fontSize: '1.2rem' }}>{notification.isSuccess ? '✅' : '❌'}</span> 
         {notification.message}
-    </div>
+      </div>
 
       {showModal && <CongratulationsModal isOpen={showModal} onClose={() => setShowModal(false)} />}
 
@@ -222,27 +215,40 @@ const ChallengeLogForm = ({
           <section style={{ flexShrink: 0 }}>
             <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.12em', display: 'block', marginBottom: '12px' }}>Proof of Work</label>
             <div onClick={() => !selectedImage && document.getElementById('file-upload')?.click()}
-              style={{ border: selectedImage ? 'none' : '2px dashed #e2e8f0', borderRadius: '32px', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc', cursor: selectedImage ? 'default' : 'pointer', overflow: 'hidden', position: 'relative' }}>
+              style={{ 
+                border: selectedImage ? '2px solid #f1f5f9' : '2px dashed #e2e8f0', 
+                borderRadius: '32px', 
+                height: '380px', // INCREASED HEIGHT
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                backgroundColor: '#f8fafc', 
+                cursor: selectedImage ? 'default' : 'pointer', 
+                overflow: 'hidden', 
+                position: 'relative' 
+              }}>
               {selectedImage ? (
-                <div style={{ width: '100%', height: '100%', animation: 'fadeIn 0.4s ease' }}>
-                  <img src={selectedImage} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setImageFile(null); }} style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(15, 23, 42, 0.8)', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer' }}>×</button>
+                <div style={{ width: '100%', height: '100%', animation: 'fadeIn 0.4s ease', backgroundColor: '#000' }}>
+                  <img 
+                    src={selectedImage} 
+                    alt="Preview" 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'contain' // FIXES ZOOMING
+                    }} 
+                  />
+                  <button onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setImageFile(null); }} style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(15, 23, 42, 0.8)', color: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', zIndex: 10 }}>×</button>
                 </div>
               ) : (
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>📸</div>
-                  <p style={{ margin: 0, fontWeight: '700', color: '#334155' }}>Upload Today's Work</p>
+                  <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📸</div>
+                  <p style={{ margin: 0, fontWeight: '700', color: '#334155', fontSize: '1.1rem' }}>Upload Today's Work</p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>Tap to browse photos</p>
                   <input id="file-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                 </div>
               )}
             </div>
-          </section>
-
-          <section style={{ backgroundColor: '#f1f5f9', borderRadius: '32px', padding: '28px', flexShrink: 0 }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.12em', display: 'block', marginBottom: '14px' }}>Reflection</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What did you learn today?"
-              style={{ width: '100%', height: '120px', background: 'transparent', border: 'none', outline: 'none', resize: 'none', fontSize: '1.1rem', color: '#1e293b', fontFamily: 'inherit', lineHeight: '1.6' }}
-            />
           </section>
         </div>
 
