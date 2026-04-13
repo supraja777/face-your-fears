@@ -1,9 +1,11 @@
 import React from 'react';
 
-const ImageGallery = () => {
-  // Mock data for gallery items
-  const galleryItems = [1, 2, 3, 4, 5, 6];
+interface ImageGalleryProps {
+  photos?: string[]; // Array of URLs from Supabase
+}
 
+const ImageGallery = ({ photos = [] }: ImageGalleryProps) => {
+  console.log("Getting images ? ", photos)
   return (
     <div className="no-scrollbar" style={{
       backgroundColor: '#f8fafc',
@@ -22,7 +24,7 @@ const ImageGallery = () => {
         gap: '16px',
         overflowY: 'auto',
       }}>
-        {/* Special "Add Evidence" Slot */}
+        {/* "Add Evidence" Slot - Always visible */}
         <div style={{
           aspectRatio: '1',
           backgroundColor: '#ffffff',
@@ -52,37 +54,72 @@ const ImageGallery = () => {
           New Log
         </div>
 
-        {galleryItems.map((item) => (
-          <div key={item} style={{
+        {/* Real Dynamic Content */}
+        {photos.map((photoUrl, index) => (
+          <div key={index} style={{
             aspectRatio: '1',
             backgroundColor: '#ffffff',
             borderRadius: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#94a3b8',
-            fontSize: '0.8rem',
-            fontWeight: '600',
             border: '1px solid #e2e8f0',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            cursor: 'default',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+            cursor: 'zoom-in',
+            overflow: 'hidden',
+            position: 'relative'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = '#6366f1';
-            e.currentTarget.style.color = '#6366f1';
             e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(99, 102, 241, 0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = '#e2e8f0';
-            e.currentTarget.style.color = '#94a3b8';
-            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.02)';
+            e.currentTarget.style.boxShadow = 'none';
           }}
-        >
-          <div style={{ fontSize: '1.2rem', marginBottom: '4px', opacity: 0.6 }}>🖼️</div>
-          Log #{item}
-        </div>
+          >
+            <img 
+              src={photoUrl} 
+              alt={`Log ${index + 1}`} 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+              onError={(e) => {
+                // If URL is broken, show a placeholder icon
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=Image+Error';
+              }}
+            />
+            {/* Overlay label */}
+            <div style={{
+              position: 'absolute',
+              bottom: '8px',
+              left: '8px',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              padding: '2px 8px',
+              borderRadius: '8px',
+              fontSize: '0.65rem',
+              fontWeight: '700',
+              color: '#475569'
+            }}>
+              Log #{index + 1}
+            </div>
+          </div>
+        ))}
+
+        {/* Empty State placeholders if there are no photos yet */}
+        {photos.length === 0 && [1, 2].map((i) => (
+          <div key={`empty-${i}`} style={{
+            aspectRatio: '1',
+            backgroundColor: '#f1f5f9',
+            borderRadius: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#cbd5e1',
+            border: '1px solid #e2e8f0',
+            opacity: 0.5
+          }}>
+            <div style={{ fontSize: '1.2rem' }}>🖼️</div>
+          </div>
         ))}
       </div>
 

@@ -1,11 +1,14 @@
 import React from 'react';
 import ImageGallery from './ImageGallery';
 
+// Updated to match your database schema
 interface Challenge {
-  name: string;
+  id?: string;
+  challenge_description: string;
   streak: number;
-  description?: string;
-  difficulty?: string;
+  tags?: string[];
+  photos?: string[];
+  challenge_points?: number;
 }
 
 interface ChallengeInfoProps {
@@ -14,6 +17,9 @@ interface ChallengeInfoProps {
 }
 
 const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
+  // Extracting difficulty from tags if it exists, otherwise defaulting to 'Standard'
+  const difficulty = challenge.tags?.length ? challenge.tags[0] : 'Standard';
+
   return (
     <div 
       className="no-scrollbar" 
@@ -95,7 +101,7 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           letterSpacing: '-0.04em',
           lineHeight: '1.1'
         }}>
-          {challenge.name}
+          {challenge.challenge_description}
         </h3>
         
         <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
@@ -110,19 +116,29 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           }}>
             🔥 {challenge.streak} Day Streak
           </div>
-          {challenge.difficulty && (
-            <div style={{ 
-              backgroundColor: '#ffffff', 
-              color: '#475569', 
-              padding: '10px 18px', 
-              borderRadius: '14px', 
-              fontSize: '0.9rem', 
-              fontWeight: '700', 
-              border: '1px solid #e2e8f0' 
-            }}>
-              Magnitude: {challenge.difficulty}
-            </div>
-          )}
+          
+          <div style={{ 
+            backgroundColor: '#ffffff', 
+            color: '#475569', 
+            padding: '10px 18px', 
+            borderRadius: '14px', 
+            fontSize: '0.9rem', 
+            fontWeight: '700', 
+            border: '1px solid #e2e8f0' 
+          }}>
+            Magnitude: {difficulty}
+          </div>
+
+          <div style={{ 
+            backgroundColor: '#f1f5f9', 
+            color: '#0f172a', 
+            padding: '10px 18px', 
+            borderRadius: '14px', 
+            fontSize: '0.9rem', 
+            fontWeight: '700'
+          }}>
+            Points: {challenge.challenge_points || 0}
+          </div>
         </div>
 
         {/* Mission Objective Card */}
@@ -135,7 +151,6 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           position: 'relative',
           overflow: 'hidden'
         }}>
-          {/* Decorative Background Icon */}
           <div style={{
             position: 'absolute',
             right: '-10px',
@@ -155,7 +170,7 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
             textTransform: 'uppercase', 
             letterSpacing: '0.1em' 
           }}>
-            Mission Objective
+            Mission Detail
           </h5>
           <p style={{ 
             margin: 0, 
@@ -164,12 +179,13 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
             lineHeight: '1.6', 
             fontWeight: '500' 
           }}>
-            {challenge.description || "Define your path and conquer the unknown."}
+            {/* Using description if available, otherwise utilizing tags as a summary */}
+            Continuing your progress in {challenge.challenge_description}. 
+            {challenge.tags?.length ? ` Focus areas: ${challenge.tags.join(', ')}.` : ""}
           </p>
         </div>
       </div>
 
-      {/* Content Divider */}
       <div style={{ 
         height: '1px', 
         backgroundColor: '#f1f5f9', 
@@ -189,7 +205,9 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           Evidence Gallery
         </h4>
         <div className="no-scrollbar" style={{ overflowY: 'auto' }}>
-          <ImageGallery />
+          {/* Passing the actual photo array to the gallery if you've updated it */}
+          {/* <ImageGallery photos={challenge.photos} /> */}
+          <ImageGallery/>
         </div>
       </div>
 

@@ -1,45 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ChallengesGrid from "./ChallengesGrid";
-import CongratulationsModal from "./CongratulationsModal"; // Ensure this is imported
+import CongratulationsModal from "./CongratulationsModal";
 import ChallengeInfo from "./ChallengeInfo";
 import AddChallengeModal from "./AddChallengeModal";
+import { getChallengesByUserId } from "../database/challenge_utils"; // Import your utility
+
+interface LeftProps {
+  user: any;
+  selectedChallenge: any;
+  setSelectedChallenge: (c: any) => void;
+}
 
 export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }: LeftProps) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  const [challenges, setChallenges] = useState([
-    { name: "Cold Outreach", streak: 150, description: "Cold Outreach desc" },
-    { name: "Networking Event", streak: 150, description: "Networking Event Desc" }
-  ]);
+  // Initialize with empty array since we are fetching from DB
+  const [challenges, setChallenges] = useState<any[]>([]);
+
+  // --- FETCH DATA ON MOUNT ---
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      console.log("In left Component the user data is ", user)
+      if (user?.id) {
+        try {
+          setLoading(true);
+          const data = await getChallengesByUserId(user.id);
+          setChallenges(data || []);
+        } catch (error) {
+          console.error("Failed to load challenges:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchChallenges();
+  }, [user]);
 
   const handleAddChallenge = (newChallengeData: { name: string; description: string; difficulty: string }) => {
-    const newEntry = { name: newChallengeData.name, streak: 0, description : "" };
+    // Note: In a real app, you would call createChallenge() utility here, 
+    // then re-fetch or update state with the returned DB object.
+    const newEntry = { 
+      challenge_description: newChallengeData.description, 
+      streak: 0, 
+      tags: [newChallengeData.difficulty] 
+    };
     
-    // 1. Update the list
     setChallenges(prev => [newEntry, ...prev]);
-    
-    // 2. Show the celebration!
     setIsSuccessModalOpen(true);
   };
 
   return (
     <section style={{ flex: '0 0 70%', height: 'calc(100vh - 70px)', padding: '32px', boxSizing: 'border-box' }}>
       
-      {/* Celebration Modal */}
       <CongratulationsModal 
         isOpen={isSuccessModalOpen} 
         onClose={() => setIsSuccessModalOpen(false)} 
       />
 
-      {/* Entry Form Modal */}
       <AddChallengeModal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onAdd={handleAddChallenge}
       />
 
-      <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        
         {!selectedChallenge && (
           <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div>
@@ -50,7 +78,7 @@ export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }:
             </div>
             <button 
               onClick={() => setIsAddModalOpen(true)} 
-              style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '700', cursor: 'pointer' }}
+              style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)' }}
             >
               + Add Challenge
             </button>
@@ -58,7 +86,11 @@ export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }:
         )}
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          {selectedChallenge ? (
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+               <p style={{ color: '#64748b', fontWeight: '600' }}>Loading your challenges...</p>
+            </div>
+          ) : selectedChallenge ? (
             <ChallengeInfo challenge={selectedChallenge} onBack={() => setSelectedChallenge(null)} />
           ) : (
             <ChallengesGrid challenges={challenges} onSelect={(c) => setSelectedChallenge(c)} />

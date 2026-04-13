@@ -3,6 +3,7 @@ import { supabase } from './database/supabaseClient';
 import NavigationBar from './components/NavigationBar';
 import MainContent from './components/MainContent';
 import { UserProfile } from './types/UserProfile';
+import { getUserById } from './database/profile_utils';
 
 
 export default function App() {
@@ -12,9 +13,10 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
-        const { data, error } = await supabase.rpc('get_user_details');
-        if (error) throw error;
-        if (data && data.length > 0) setUser(data[0]);
+        const data = await getUserById();
+        console.log("User data is ", data)
+        if (data) setUser(data);
+        else console.log("Failed to fetch user data")
       } catch (err) {
         console.error("Supabase error:", err);
       }

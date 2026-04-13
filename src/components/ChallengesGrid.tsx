@@ -1,8 +1,12 @@
 import React from 'react';
 
+// Updated to match your Supabase schema
 interface Challenge {
-  name: string;
+  id?: string;
+  challenge_description: string;
   streak: number;
+  tags?: string[];
+  challenge_points?: number;
 }
 
 interface ChallengesGridProps {
@@ -11,17 +15,18 @@ interface ChallengesGridProps {
 }
 
 const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
+  console.log("In challenge grid ", challenges);
+
   return (
     <div style={{
       display: 'grid',
-      // This forces exactly 2 columns per row
       gridTemplateColumns: '1fr 1fr', 
       gap: '24px',
       padding: '4px'
     }}>
       {challenges.map((challenge, index) => (
         <div 
-          key={index}
+          key={challenge.id || index}
           onClick={() => onSelect(challenge)}
           style={{
             backgroundColor: '#ffffff',
@@ -34,12 +39,13 @@ const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
             flexDirection: 'column',
             justifyContent: 'space-between',
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            minHeight: '200px'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'translateY(-8px)';
             e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.05)';
-            e.currentTarget.style.borderColor = '#e2e8f0';
+            e.currentTarget.style.borderColor = '#6366f1';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'translateY(0)';
@@ -47,6 +53,7 @@ const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
             e.currentTarget.style.borderColor = '#f1f5f9';
           }}
         >
+          {/* Background Decor */}
           <div style={{
             position: 'absolute',
             top: '-10px',
@@ -67,25 +74,26 @@ const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
               backgroundColor: '#f8fafc',
               borderRadius: '16px'
             }}>
-              🔥
+              🚀
             </div>
             
-            <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>
-              {challenge.name}
+            <h4 style={{ 
+              margin: 0, 
+              fontSize: '1.25rem', 
+              fontWeight: '800', 
+              color: '#0f172a',
+              lineHeight: '1.3' 
+            }}>
+              {challenge.challenge_description}
             </h4>
-            <p style={{ 
-            margin: 0, 
-            fontSize: '0.9rem', 
-            color: '#64748b', 
-            lineHeight: '1.5',
-            display: '-webkit-box',
-            WebkitLineClamp: 2, // Limits to 2 lines
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
-            {challenge.description || "No objective set."}
-          </p>
+            
+            <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {challenge.tags?.slice(0, 2).map((tag, i) => (
+                <span key={i} style={{ fontSize: '0.7rem', color: '#6366f1', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  #{tag}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -95,11 +103,26 @@ const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
               padding: '6px 14px',
               borderRadius: '99px',
               fontSize: '0.85rem',
-              fontWeight: '700'
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}>
-              {challenge.streak} Day Streak
+              <span>🔥</span> {challenge.streak} Day Streak
             </div>
-            <span style={{ color: '#6366f1', fontSize: '1.2rem', fontWeight: '700' }}>→</span>
+            <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: '#f8fafc',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#6366f1',
+                fontWeight: 'bold'
+            }}>
+              →
+            </div>
           </div>
         </div>
       ))}
