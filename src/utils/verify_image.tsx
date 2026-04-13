@@ -36,7 +36,7 @@ export const isValidPhoto = async (imageFile: File, image: string, taskDescripti
     
     return {
       verified: result.verified, 
-      message: result.verified ? "Saving your accomplishment" : "Photo content doesn't match the task."
+      message: result.reason ? result.reason: "Photo content doesn't match the task."
     };
 
   } catch (error) {

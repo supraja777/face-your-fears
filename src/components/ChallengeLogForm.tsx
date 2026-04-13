@@ -119,7 +119,11 @@ const ChallengeLogForm = ({
           message: result.message, // Shows "Please upload today's photo" or AI error
           isSuccess: false 
         });
-        setIsAuditing(false);
+         setSelectedImage(null);
+            setBase64Image(null);
+            setImageFile(null);
+            setNotes('');
+            setIsAuditing(false);
       }
     } catch (error) {
       console.error("Save process failed:", error);
@@ -128,7 +132,11 @@ const ChallengeLogForm = ({
         message: "Network error. Please try again.", 
         isSuccess: false 
       });
-      setIsAuditing(false);
+       setSelectedImage(null);
+            setBase64Image(null);
+            setImageFile(null);
+            setNotes('');
+            setIsAuditing(false);
     }
   };
 
