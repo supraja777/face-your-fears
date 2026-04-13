@@ -8,14 +8,14 @@ import { getChallengesByUserId } from './database/challenge_utils';
 import './index.css'; // 👈 Must be at the top!
 
 
-export default function App() {
-  const [user, setUser] = useState<ProfileData | null>(null);
+export default function App({ user, onLogout }: { user: any, onLogout: () => void }) {
+ 
   const [selectedChallenge, setSelectedChallenge] = useState<any>(false);
   const [loading, setLoading] = useState(true);
   const[challenges, setChallenges] = useState([])
 
-  const fetchChallenges = async (userId) => {
-      userId = "4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa"
+  const fetchChallenges = async (userId?: string) => {
+    
       console.log("In the fetch challenges ", userId)
       if (userId) {
           try {
@@ -36,22 +36,26 @@ export default function App() {
           }
         }
       }; 
+useEffect(() => {
+  if (user?.id) {
+    fetchChallenges(user.id);
+  }
+}, [user]); // Run this whenever the user state changes
 
+  // useEffect(() => {
+  //   async function loadData() {
+  //     try {
+  //       const data = await getUserById();
+  //       console.log("User data is ", data)
+  //       if (data) setUser(data);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await getUserById();
-        console.log("User data is ", data)
-        if (data) setUser(data);
-
-        else console.log("Failed to fetch user data")
-      } catch (err) {
-        console.error("Supabase error:", err);
-      }
-    }
-    loadData();
-  }, []);
+  //       else console.log("Failed to fetch user data")
+  //     } catch (err) {
+  //       console.error("Supabase error:", err);
+  //     }
+  //   }
+  //   loadData();
+  // }, []);
 
   return (
     <div style={{ 

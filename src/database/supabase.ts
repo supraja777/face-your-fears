@@ -1,21 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-// 1. Get values safely
-const supabaseUrl = 
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 
-  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) || 
-  "";
+// 1. Grab values (no 'import' or 'require' needed)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const supabaseAnonKey = 
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 
-  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) || 
-  "";
+// 2. Add this log to see what is happening in the browser console
+console.log("Supabase URL Check:", supabaseUrl);
 
-console.log("In supabase ts");
-
-// 2. Validate (Optional but helpful)
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase credentials not found. Check your .env file and restart your server.");
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// 3. Prevent the crash by providing fallback strings if undefined
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder-key'
+);

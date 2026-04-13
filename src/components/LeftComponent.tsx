@@ -17,42 +17,79 @@ export const LeftComponent = ({ challenges, user, selectedChallenge, setSelected
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  // Use the ID consistent with your fetch logic
-  const ACTIVE_USER_ID = "4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa";
 
   useEffect(() => {
-    fetchChallenges(ACTIVE_USER_ID);
-  }, [user]);
+  // Check if user exists AND has an id property before calling the function
+  if (user && user.id) {
+    fetchChallenges(user.id);
+  } else {
+    console.log("Waiting for user data to load...");
+  }
+}, [user]);
 
-  const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
-    try {
-      const pointMapping: Record<string, number> = {
-        'xs': 10, 's': 20, 'm': 50, 'l': 100, 'xl': 200
-      };
+const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
+  // 1. ADD THIS GUARD: If user is missing, stop immediately
+  if (!user || !user.id) {
+    alert("User session not found. Please try logging in again.");
+    return;
+  }
 
-      const difficultyKey = newChallengeData.difficulty.toLowerCase();
-      const points = pointMapping[difficultyKey] || 0;
+  try {
+    const pointMapping: Record<string, number> = {
+      'xs': 10, 's': 20, 'm': 50, 'l': 100, 'xl': 200
+    };
 
-      const newChallengePayload = {
-        user_id: ACTIVE_USER_ID,
-        challenge_description: newChallengeData.description,
-        streak: 0,
-        photos: [],
-        tags: [newChallengeData.difficulty],
-        challenge_points: points
-      };
+    const difficultyKey = newChallengeData.difficulty.toLowerCase();
+    const points = pointMapping[difficultyKey] || 0;
 
-      const createdChallenge = await createChallenge(newChallengePayload);
+    const newChallengePayload = {
+      user_id: user.id, // Now safe because of the guard above
+      challenge_description: newChallengeData.description,
+      streak: 0,
+      photos: [],
+      tags: [newChallengeData.difficulty],
+      challenge_points: points
+    };
 
-      if (createdChallenge) {
-        await fetchChallenges(ACTIVE_USER_ID);
-        setIsSuccessModalOpen(true);
-      }
-    } catch (error) {
-      console.error("Failed to create challenge:", error);
+    const createdChallenge = await createChallenge(newChallengePayload);
+
+    if (createdChallenge) {
+      await fetchChallenges(user.id);
+      setIsSuccessModalOpen(true);
     }
-  };
+  } catch (error) {
+    console.error("Failed to create challenge:", error);
+  }
+};
+
+  // const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
+  //   try {
+  //     const pointMapping: Record<string, number> = {
+  //       'xs': 10, 's': 20, 'm': 50, 'l': 100, 'xl': 200
+  //     };
+
+  //     const difficultyKey = newChallengeData.difficulty.toLowerCase();
+  //     const points = pointMapping[difficultyKey] || 0;
+
+  //     const newChallengePayload = {
+  //       user_id: user.id,
+  //       challenge_description: newChallengeData.description,
+  //       streak: 0,
+  //       photos: [],
+  //       tags: [newChallengeData.difficulty],
+  //       challenge_points: points
+  //     };
+
+  //     const createdChallenge = await createChallenge(newChallengePayload);
+
+  //     if (createdChallenge) {
+  //       await fetchChallenges(user.id);
+  //       setIsSuccessModalOpen(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to create challenge:", error);
+  //   }
+  // };
 
   return (
     <section style={{ 
