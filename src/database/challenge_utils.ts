@@ -101,7 +101,7 @@ export const uploadToCloudinary = async (base64Image: string): Promise<string | 
     }
 
     const data = await response.json();
-    return data.secure_url; // This is the short URL (e.g. https://res.cloudinary.com/...)
+    return {cloudinaryUrl: data.secure_url, etag: data.etag}; // This is the short URL (e.g. https://res.cloudinary.com/...)
   } catch (error) {
     console.error("Cloudinary Error:", error);
     return null;
@@ -109,7 +109,7 @@ export const uploadToCloudinary = async (base64Image: string): Promise<string | 
 };
 
 
-export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
+export const addPhotoToChallenge = async (challengeId, etag, newPhotoUrl, reflectionNotes) => {
   console.log("Adding photo to DB (Prepend + Limit 6):", challengeId, newPhotoUrl);
   
   try {
@@ -125,6 +125,7 @@ export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNo
     // 2. Prepare the new array
     const newEntry = {
       url: newPhotoUrl,
+      etag: etag,
       notes: reflectionNotes || "",
       timestamp: new Date().toISOString()
     };

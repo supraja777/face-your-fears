@@ -16,7 +16,7 @@ export default function NavigationBar({ user, onLogout }: NavProps) {
       borderBottom: '1px solid #e2e8f0'
     }}>
       <div>
-        <span style={{ fontWeight: 800, fontSize: '1.2rem', color: '#6366f1' }}>CHALLENGE APP</span>
+        <span style={{ fontWeight: 800, fontSize: '1.2rem', color: '#6366f1' }}>Face Your Fears!</span>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>

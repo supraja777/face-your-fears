@@ -81,7 +81,7 @@ const MainContent = ({
       }}>
         {selectedChallenge ? (
           <ChallengeLogForm 
-            selectedChallengePhotos={selectedChallengePhotos}
+            selectedChallenge = {selectedChallenge}
             challengeId={selectedChallenge.id}
             challengeName={selectedChallenge.name} 
             streak={selectedChallenge.streak} 

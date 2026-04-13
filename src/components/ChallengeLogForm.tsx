@@ -10,7 +10,7 @@ interface EvidenceItem {
 }
 
 interface ChallengeLogFormProps {
-  selectedChallengePhotos: [] | null,
+  selectedChallenge: [] | null,
   challengeId: string | null;
   challengeName: string | null;
   streak: number | null;
@@ -20,6 +20,7 @@ interface ChallengeLogFormProps {
 }
 
 const ChallengeLogForm = ({ 
+  selectedChallenge,
   selectedChallengePhotos,
   challengeId, 
   streak, 
@@ -88,15 +89,42 @@ const ChallengeLogForm = ({
       // Ensure isValidPhoto accepts (File, string, string)
       const result = await isValidPhoto(imageFile, base64Image, description || "Task");
 
+      console.log("Getting resulr?? ", result)
+
       if (result.verified) {
         // 2. CLOUDINARY UPLOAD
-        const cloudinaryUrl = await uploadToCloudinary(selectedImage);
+        const {cloudinaryUrl, etag} = await uploadToCloudinary(selectedImage);
+
+        console.log("Cloudinary url ", cloudinaryUrl)
+        console.log("ETAG ", etag)
 
         if (cloudinaryUrl) {
+         const isDuplicate = selectedChallenge.photos?.some((photoEntry: any) => {
+          let parsed = photoEntry;
+          console.log("What is paresed ", parsed)
+          // If your photos are stored as strings in the DB, parse them first
+          if (typeof photoEntry === 'string') {
+            try { parsed = JSON.parse(photoEntry); } catch (e) { return false; }
+          }
+          
+          return parsed.etag === etag;
+        });
+          console.log("No duplicate savinf")
+
+          if (isDuplicate) {
+             setNotification({ 
+                show: true, 
+                message: "Duplicate photo identified! Upload a new one.", 
+                isSuccess: false 
+              });
+              return;
+          }
+      
           // 3. DATABASE SAVE
-          const isSaved = await addPhotoToChallenge(challengeId, cloudinaryUrl, notes);
+          const isSaved = await addPhotoToChallenge(challengeId, etag, cloudinaryUrl, notes);
 
           if (isSaved) {
+            
             await refreshChallenges();
             setNotification({ 
               show: true, 
