@@ -22,6 +22,12 @@ export default function App() {
             const data = await getChallengesByUserId(userId);
             console.log("IN left challenges data is ", data)
             setChallenges(data);
+            if (selectedChallenge.id) {
+              const updatedTarget = data.find(c => c.id === selectedChallenge.id);
+              if (updatedTarget) {
+                setSelectedChallenge({ ...updatedTarget });
+              }
+            }
           } catch (error) {
             console.error("Failed to load challenges:", error);
           } finally {

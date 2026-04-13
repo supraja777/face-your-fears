@@ -82,8 +82,8 @@ export const getChallengeData = async (userId) => {
 };
 
 export const uploadToCloudinary = async (base64Image: string): Promise<string | null> => {
-  const cloudName = CLOUD_NAME; // Replace with your Cloud Name
-  const uploadPreset = PRESET_NAME; // Replace with your Unsigned Preset
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_PRESET_NAME;
 
   try {
     // Cloudinary expects the full Data URI (with the 'data:image/jpeg;base64,' prefix)

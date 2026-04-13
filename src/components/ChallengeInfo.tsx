@@ -207,7 +207,7 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
         <div className="no-scrollbar" style={{ overflowY: 'auto' }}>
           {/* Passing the actual photo array to the gallery if you've updated it */}
           {/* <ImageGallery photos={challenge.photos} /> */}
-          <ImageGallery photos={challenge.photos}/>
+          <ImageGallery photos={challenge.photos} key={challenge.photos?.length || 0} />
           {/* console.log({challenge.photos})
           <ImageGallery photos={challenge.photos?.map((p: any) => p.url) || []} /> */}
         </div>

@@ -78,15 +78,7 @@ const ChallengeLogForm = ({
       const verified = await isValidPhoto(base64Image, description || "Task");
 
       if (verified) {
-        // 2. Prepare entry
-        const newEntry: EvidenceItem = {
-          url: selectedImage,
-          date: new Date().toISOString(),
-          notes: notes
-        };
-
-        // 3. TODO: Add your DB update call here
-
+      
         const cloudinaryUrl = await uploadToCloudinary(selectedImage);
 
         if (cloudinaryUrl) {
@@ -107,11 +99,8 @@ const ChallengeLogForm = ({
                 setSelectedImage(null)
                 
                 setTimeout(() => setShowModal(true), 1000);
-            }
-
-          
+              }
         }
-        
 
       } else {
         setNotification({ 
