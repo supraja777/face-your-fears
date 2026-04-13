@@ -3,74 +3,65 @@ import ChallengesGrid from "./ChallengesGrid";
 import CongratulationsModal from "./CongratulationsModal";
 import ChallengeInfo from "./ChallengeInfo";
 import AddChallengeModal from "./AddChallengeModal";
-import { createChallenge, getChallengesByUserId } from "../database/challenge_utils"; // Import your utility
+import { createChallenge } from "../database/challenge_utils";
 
 interface LeftProps {
   challenges: any[];
   user: any;
   selectedChallenge: any;
   setSelectedChallenge: (c: any) => void;
-  fetchChallenges: (c : any) => void;
+  fetchChallenges: (userId: string) => void;
 }
 
 export const LeftComponent = ({ challenges, user, selectedChallenge, setSelectedChallenge, fetchChallenges }: LeftProps) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const[loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   
-  // --- FETCH DATA ON MOUNT ---
+  // Use the ID consistent with your fetch logic
+  const ACTIVE_USER_ID = "4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa";
+
   useEffect(() => {
-    console.log("In use Effect user id ", user)
-    fetchChallenges("45a43e83-d65b-4dfc-af7a-821259632c52");
+    fetchChallenges(ACTIVE_USER_ID);
   }, [user]);
 
-    const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
+  const handleAddChallenge = async (newChallengeData: { name: string; description: string; difficulty: string }) => {
     try {
-      // 1. Map difficulty strings to point values
       const pointMapping: Record<string, number> = {
-        'xs': 10,
-        's': 20,
-        'm': 50,
-        'l': 100,
-        'xl': 200
+        'xs': 10, 's': 20, 'm': 50, 'l': 100, 'xl': 200
       };
 
-      // Normalize the input difficulty to lowercase to match the mapping
       const difficultyKey = newChallengeData.difficulty.toLowerCase();
       const points = pointMapping[difficultyKey] || 0;
 
-      // 2. Prepare the data for Supabase
       const newChallengePayload = {
-        user_id: "4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa", // Use your active User ID
+        user_id: ACTIVE_USER_ID,
         challenge_description: newChallengeData.description,
         streak: 0,
-        photos: [], // Start with an empty gallery
-        tags: [newChallengeData.difficulty], // Store ['XS'], ['M'], etc.
+        photos: [],
+        tags: [newChallengeData.difficulty],
         challenge_points: points
       };
 
-      // 3. Call the Supabase utility
-      // This will return the new database record including the generated ID
       const createdChallenge = await createChallenge(newChallengePayload);
 
       if (createdChallenge) {
-        console.log("New Challenge Created with ID:", createdChallenge.id);
-        
-        // 4. Refresh your UI list to show the new challenge
-        // This ensures your "Left Component" list stays in sync
-        await fetchChallenges("4c9e5a57-6fe1-471d-b6bc-8a87af0f58aa");
-
-        // 5. Success UI
+        await fetchChallenges(ACTIVE_USER_ID);
         setIsSuccessModalOpen(true);
       }
     } catch (error) {
       console.error("Failed to create challenge:", error);
-      // Optionally add a notification for the user here
     }
   };
 
   return (
-    <section style={{ flex: '0 0 70%', height: 'calc(100vh - 70px)', padding: '32px', boxSizing: 'border-box' }}>
+    <section style={{ 
+      flex: '0 0 70%', 
+      height: '100%', 
+      padding: '24px', 
+      boxSizing: 'border-box',
+      overflow: 'hidden' // Prevents the very outer section from scrolling
+    }}>
       
       <CongratulationsModal 
         isOpen={isSuccessModalOpen} 
@@ -83,34 +74,81 @@ export const LeftComponent = ({ challenges, user, selectedChallenge, setSelected
         onAdd={handleAddChallenge}
       />
 
-      <div style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '32px', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div style={{ 
+        backgroundColor: '#ffffff', 
+        padding: '32px', 
+        borderRadius: '32px', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        position: 'relative',
+        boxSizing: 'border-box', // Crucial: Includes padding in the 100% height calculation
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9'
+      }}>
         
+        {/* Header Section: Only shows when no challenge is selected */}
         {!selectedChallenge && (
-          <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ 
+            marginBottom: '32px', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-end',
+            flexShrink: 0 
+          }}>
             <div>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Workspace</h2>
-              <p style={{ color: '#64748b', fontSize: '1.15rem', marginTop: '8px' }}>
+              <h2 style={{ fontSize: '2.4rem', fontWeight: '800', color: '#0f172a', margin: 0, letterSpacing: '-0.03em' }}>
+                Workspace
+              </h2>
+              <p style={{ color: '#64748b', fontSize: '1.1rem', marginTop: '6px' }}>
                 Welcome back, <span style={{ color: '#6366f1', fontWeight: '700' }}>{user?.full_name || 'Supraja'}</span>
               </p>
             </div>
             <button 
               onClick={() => setIsAddModalOpen(true)} 
-              style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', color: 'white', border: 'none', borderRadius: '20px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)' }}
+              style={{ 
+                padding: '14px 28px', 
+                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '16px', 
+                fontWeight: '700', 
+                cursor: 'pointer', 
+                boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.3)',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               + Add Challenge
             </button>
           </div>
         )}
 
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        {/* Content Wrapper */}
+        <div style={{ 
+          flex: 1, 
+          overflow: 'hidden', // Forces children (Grid or Info) to handle their own internal space
+          minHeight: 0,        // Critical secret for nested flex scroll issues
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-               <p style={{ color: '#64748b', fontWeight: '600' }}>Loading your challenges...</p>
+               <p style={{ color: '#64748b', fontWeight: '600' }}>Updating mission logs...</p>
             </div>
           ) : selectedChallenge ? (
-            <ChallengeInfo challenge={selectedChallenge} onBack={() => setSelectedChallenge(null)} />
+            <ChallengeInfo 
+              challenge={selectedChallenge} 
+              onBack={() => setSelectedChallenge(null)} 
+            />
           ) : (
-            <ChallengesGrid challenges={challenges} onSelect={(c) => setSelectedChallenge(c)} />
+            <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto' }}>
+              <ChallengesGrid 
+                challenges={challenges} 
+                onSelect={(c) => setSelectedChallenge(c)} 
+              />
+            </div>
           )}
         </div>
       </div>

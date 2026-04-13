@@ -1,7 +1,6 @@
 import React from 'react';
 import ImageGallery from './ImageGallery';
 
-// Updated to match your database schema
 interface Challenge {
   id?: string;
   challenge_description: string;
@@ -17,8 +16,10 @@ interface ChallengeInfoProps {
 }
 
 const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
-  // Extracting difficulty from tags if it exists, otherwise defaulting to 'Standard'
+  // Extracting difficulty from tags if it exists
   const difficulty = challenge.tags?.length ? challenge.tags[0] : 'Standard';
+  // Calculate total XP: streak * base points
+  const totalXp = (challenge.streak || 0) * (challenge.challenge_points || 0);
 
   return (
     <div 
@@ -29,13 +30,16 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
         padding: '32px',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
+        // --- LAYOUT BOUNDARIES ---
+        height: '100%',        // Fits exactly inside MainContent
+        maxHeight: '100%',     // No vertical expansion
+        overflow: 'hidden',    // Kills the outer scrollbar
+        // -------------------------
         boxSizing: 'border-box',
         animation: 'slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         fontFamily: "'Plus Jakarta Sans', sans-serif",
-        overflowY: 'auto',
         border: '1px solid #f1f5f9',
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.02)'
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.02)',
       }}
     >
       {/* Navigation Header */}
@@ -43,7 +47,7 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: '32px',
+        marginBottom: '28px',
         flexShrink: 0 
       }}>
         <button
@@ -57,131 +61,127 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
             color: '#64748b',
             fontWeight: '700',
             cursor: 'pointer',
-            padding: '12px 20px',
-            borderRadius: '16px',
-            fontSize: '0.9rem',
-            transition: 'all 0.3s ease',
+            padding: '10px 18px',
+            borderRadius: '14px',
+            fontSize: '0.85rem',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = '#6366f1';
             e.currentTarget.style.color = '#ffffff';
             e.currentTarget.style.borderColor = '#6366f1';
-            e.currentTarget.style.transform = 'translateX(-4px)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = '#f8fafc';
             e.currentTarget.style.color = '#64748b';
             e.currentTarget.style.borderColor = '#e2e8f0';
-            e.currentTarget.style.transform = 'translateX(0)';
           }}
         >
-          ← Back
+          ← Back to Grid
         </button>
 
         <div style={{
-          padding: '8px 16px',
-          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-          borderRadius: '12px',
+          padding: '6px 14px',
+          background: '#f0fdf4',
+          borderRadius: '10px',
           color: '#16a34a',
-          fontSize: '0.85rem',
-          fontWeight: '700',
-          border: '1px solid #bbf7d0'
+          fontSize: '0.75rem',
+          fontWeight: '800',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          border: '1px solid #dcfce7'
         }}>
           Active Mission
         </div>
       </div>
 
-      {/* Hero Title Section */}
-      <div style={{ marginBottom: '40px', flexShrink: 0 }}>
+      {/* Hero Content Section */}
+      <div style={{ marginBottom: '32px', flexShrink: 0 }}>
         <h3 style={{ 
-          fontSize: '2.8rem', 
+          fontSize: '2.4rem', 
           fontWeight: '800', 
           color: '#0f172a', 
           margin: 0, 
-          letterSpacing: '-0.04em',
+          letterSpacing: '-0.03em',
           lineHeight: '1.1'
         }}>
           {challenge.challenge_description}
         </h3>
         
-        <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          {/* Streak Badge */}
           <div style={{ 
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-            color: '#ffffff', 
-            padding: '10px 18px', 
-            borderRadius: '14px', 
-            fontSize: '0.9rem', 
-            fontWeight: '700',
-            boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.2)'
+            backgroundColor: '#ecfdf5',
+            color: '#059669', 
+            padding: '8px 14px', 
+            borderRadius: '12px', 
+            fontSize: '0.85rem', 
+            fontWeight: '800',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            border: '1px solid #d1fae5'
           }}>
             🔥 {challenge.streak} Day Streak
           </div>
           
+          {/* XP Badge */}
           <div style={{ 
-            backgroundColor: '#ffffff', 
-            color: '#475569', 
-            padding: '10px 18px', 
-            borderRadius: '14px', 
-            fontSize: '0.9rem', 
-            fontWeight: '700', 
-            border: '1px solid #e2e8f0' 
+            backgroundColor: '#fffbeb', 
+            color: '#d97706', 
+            padding: '8px 14px', 
+            borderRadius: '12px', 
+            fontSize: '0.85rem', 
+            fontWeight: '800',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            border: '1px solid #fef3c7'
           }}>
-            Magnitude: {difficulty}
+            ⭐ +{totalXp} xp
           </div>
 
           <div style={{ 
-            backgroundColor: '#f1f5f9', 
-            color: '#0f172a', 
-            padding: '10px 18px', 
-            borderRadius: '14px', 
-            fontSize: '0.9rem', 
-            fontWeight: '700'
+            backgroundColor: '#f8fafc', 
+            color: '#64748b', 
+            padding: '8px 14px', 
+            borderRadius: '12px', 
+            fontSize: '0.85rem', 
+            fontWeight: '700', 
+            border: '1px solid #e2e8f0' 
           }}>
-            Points: {challenge.challenge_points || 0}
+            Level: {difficulty}
           </div>
         </div>
 
         {/* Mission Objective Card */}
         <div style={{
-          marginTop: '32px',
-          padding: '28px',
+          marginTop: '28px',
+          padding: '24px',
           backgroundColor: '#f8fafc',
-          borderRadius: '24px',
+          borderRadius: '20px',
           border: '1px solid #f1f5f9',
-          position: 'relative',
-          overflow: 'hidden'
+          position: 'relative'
         }}>
-          <div style={{
-            position: 'absolute',
-            right: '-10px',
-            bottom: '-10px',
-            fontSize: '5rem',
-            opacity: '0.03',
-            userSelect: 'none'
-          }}>
-            🎯
-          </div>
-
           <h5 style={{ 
-            margin: '0 0 12px 0', 
+            margin: '0 0 10px 0', 
             color: '#6366f1', 
-            fontSize: '0.75rem', 
+            fontSize: '0.7rem', 
             fontWeight: '800', 
             textTransform: 'uppercase', 
-            letterSpacing: '0.1em' 
+            letterSpacing: '0.05em' 
           }}>
             Mission Detail
           </h5>
           <p style={{ 
             margin: 0, 
-            color: '#334155', 
-            fontSize: '1.1rem', 
+            color: '#475569', 
+            fontSize: '1rem', 
             lineHeight: '1.6', 
             fontWeight: '500' 
           }}>
-            {/* Using description if available, otherwise utilizing tags as a summary */}
             Continuing your progress in {challenge.challenge_description}. 
-            {challenge.tags?.length ? ` Focus areas: ${challenge.tags.join(', ')}.` : ""}
+            {challenge.tags?.length ? ` Key Focus: ${challenge.tags.join(', ')}.` : ""}
           </p>
         </div>
       </div>
@@ -189,27 +189,40 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
       <div style={{ 
         height: '1px', 
         backgroundColor: '#f1f5f9', 
-        marginBottom: '32px',
-        width: '100%' 
+        marginBottom: '28px',
+        width: '100%',
+        flexShrink: 0
       }} />
 
-      {/* Gallery Section */}
-      <div style={{ flex: 1 }}>
+      {/* Gallery Section - Only this part handles scrolling */}
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: 0,     // Crucial: Allows the container to shrink
+        overflow: 'hidden' 
+      }}>
         <h4 style={{ 
-          margin: '0 0 20px 0', 
+          margin: '0 0 16px 0', 
           color: '#0f172a', 
           fontWeight: '800', 
-          fontSize: '1.25rem',
-          letterSpacing: '-0.02em'
+          fontSize: '1.2rem',
+          letterSpacing: '-0.01em',
+          flexShrink: 0
         }}>
           Evidence Gallery
         </h4>
-        <div className="no-scrollbar" style={{ overflowY: 'auto' }}>
-          {/* Passing the actual photo array to the gallery if you've updated it */}
-          {/* <ImageGallery photos={challenge.photos} /> */}
-          <ImageGallery photos={challenge.photos} key={challenge.photos?.length || 0} />
-          {/* console.log({challenge.photos})
-          <ImageGallery photos={challenge.photos?.map((p: any) => p.url) || []} /> */}
+        
+        <div className="no-scrollbar" style={{ 
+          flex: 1, 
+          overflowY: 'auto', // Internal scroll only for images
+          minHeight: 0,
+          paddingBottom: '20px'
+        }}>
+          <ImageGallery 
+            photos={challenge.photos} 
+            key={challenge.photos?.length || 0} 
+          />
         </div>
       </div>
 
@@ -222,7 +235,7 @@ const ChallengeInfo = ({ challenge, onBack }: ChallengeInfoProps) => {
           scrollbar-width: none;
         }
         @keyframes slideIn {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(15px); }
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>

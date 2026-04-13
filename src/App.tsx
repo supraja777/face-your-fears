@@ -5,6 +5,7 @@ import MainContent from './components/MainContent';
 import { UserProfile } from './types/UserProfile';
 import { getUserById, ProfileData } from './database/profile_utils';
 import { getChallengesByUserId } from './database/challenge_utils';
+import './index.css'; // 👈 Must be at the top!
 
 
 export default function App() {
@@ -58,7 +59,7 @@ export default function App() {
       flexDirection: 'column', 
       height: '100vh', 
       width: '100vw', 
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#F0F4FF',
       overflow: 'hidden', 
       position: 'fixed',
       top: 0,
