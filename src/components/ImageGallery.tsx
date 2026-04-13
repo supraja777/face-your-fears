@@ -12,6 +12,7 @@ interface ImageGalleryProps {
 
 const ImageGallery = ({ photos = [] }: ImageGalleryProps) => {
   // Use a fallback to an empty array if photos is undefined/null
+  console.log("Calling image gallery!")
   const safePhotos = Array.isArray(photos) ? photos : [];
 
   // Monitor prop changes and debug data format

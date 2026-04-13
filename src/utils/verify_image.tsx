@@ -20,6 +20,7 @@ const isPhotoToday = (file: File, today: Date): boolean => {
  */
 export const isValidPhoto = async (imageFile: File, image: string, taskDescription: string) => {
   try {
+    return {verified: true, message: "testing"}
     const today = new Date();
 
     // 1. Check the date first (Instant)

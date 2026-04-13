@@ -17,6 +17,14 @@ export default function App({ user, onLogout }: { user: any, onLogout: () => voi
 
   const fetchChallenges = async (userId?: string) => {
     
+      if (!userId) {
+        const savedUser = localStorage.getItem('app_user');
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          userId = parsedUser.id;
+        }
+      }
+      console.log("Is user id undefined ", userId)
       console.log("In the fetch challenges ", userId)
       if (userId) {
           try {
