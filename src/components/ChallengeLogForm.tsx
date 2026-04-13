@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { analyzeEvidenceWithGroq } from '../utils/groq_api_utils';
 import CongratulationsModal from './CongratulationsModal';
+import { isValidPhoto } from '../utils/verify_image';
 
 interface ChallengeLogFormProps {
   challengeName: string | null;
@@ -49,21 +50,31 @@ const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFo
   };
 
   const handleSaveEntry = async () => {
-    if (!base64Image) return;
+    if (!base64Image || !selectedImage) return;
+    
     setIsAuditing(true);
-    try {
-      const result = await analyzeEvidenceWithGroq(base64Image, description || "Task");
-      if (result.verified) {
-        setNotification({ show: true, message: "Analysis done! Photo is valid ✨", isSuccess: true });
-        setTimeout(() => setShowModal(true), 1000);
-      } else {
-        setNotification({ show: true, message: "Analysis done. Photo is not valid, try again.", isSuccess: false });
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsAuditing(false);
+    
+    // Call the helper function
+    const verified = await isValidPhoto(base64Image, description || "Task");
+
+    if (verified) {
+
+      setNotification({ 
+        show: true, 
+        message: "Analysis done! Photo is valid ✨", 
+        isSuccess: true 
+      });
+      
+      setTimeout(() => setShowModal(true), 1000);
+    } else {
+      setNotification({ 
+        show: true, 
+        message: "Analysis done. Photo is not valid, try again.", 
+        isSuccess: false 
+      });
     }
+    
+    setIsAuditing(false);
   };
 
   return (
