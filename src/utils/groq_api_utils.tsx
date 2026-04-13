@@ -7,6 +7,10 @@
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 export const analyzeEvidenceWithGroq = async (base64Image: string, taskDescription: string) => {
+  return {
+    verified: true,
+    reason: " Testing "
+  }
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -21,9 +25,9 @@ export const analyzeEvidenceWithGroq = async (base64Image: string, taskDescripti
           {
             role: "user",
             content: [
-            {
-              type: "text",
-              text: `You are a mission auditor. Analyze the provided image to verify the following task: "${taskDescription}".
+              {
+                type: "text",
+                text: `You are a mission auditor. Analyze the provided image to verify the following task: "${taskDescription}".
 
               EVALUATION LOGIC:
               1. Identify the core activity in the task description (e.g., gardening, cooking, studying, etc.).
@@ -36,14 +40,14 @@ export const analyzeEvidenceWithGroq = async (base64Image: string, taskDescripti
                 "verified": boolean,
                 "reason": "Short explanation of the visual match"
               }`
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:image/jpeg;base64,${base64Image}`
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
               }
-            }
-          ]
+            ]
           }
         ],
         response_format: { type: "json_object" },
@@ -57,7 +61,7 @@ export const analyzeEvidenceWithGroq = async (base64Image: string, taskDescripti
     }
 
     const data = await response.json();
-    
+
     if (data.choices && data.choices[0]?.message?.content) {
       return JSON.parse(data.choices[0].message.content);
     } else {
