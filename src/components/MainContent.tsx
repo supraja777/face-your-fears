@@ -7,7 +7,7 @@ import MotivationComponent from "./MotivationComponent";
 interface MainContentProps {
   user: UserProfile | null,
   activeChallenge: Boolean | null
-  selectedChallenge: { name: string; streak: number }
+  selectedChallenge: { name: string; streak: number, challenge_description: string | null }
   setSelectedChallenge: (c: string | null) => void;
 }
 
@@ -25,7 +25,7 @@ const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainCont
       <LeftComponent user={user} selectedChallenge={selectedChallenge} setSelectedChallenge={setSelectedChallenge} />
       <div style={{ flex: '0 0 30%', borderLeft: '1px solid #e2e8f0' }}>
         {selectedChallenge && (
-          <ChallengeLogForm challengeName= {selectedChallenge.name}  streak={selectedChallenge.streak} challengeDescription = {selectedChallenge.description}/>
+          <ChallengeLogForm challengeName= {selectedChallenge.name}  streak={selectedChallenge.streak} description = {selectedChallenge.challenge_description}/>
         )}
         {!selectedChallenge && (
 

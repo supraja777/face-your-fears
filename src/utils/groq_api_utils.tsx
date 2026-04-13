@@ -21,19 +21,29 @@ export const analyzeEvidenceWithGroq = async (base64Image: string, taskDescripti
           {
             role: "user",
             content: [
+            {
+              type: "text",
+              text: `You are a mission auditor. Analyze the provided image to verify the following task: "${taskDescription}".
+
+              EVALUATION LOGIC:
+              1. Identify the core activity in the task description (e.g., gardening, cooking, studying, etc.).
+              2. Check if the image contains "tools of the trade," environments, or results relevant to that activity.
+              3. If the image displays a logical setting or specialized equipment used to perform the task, consider it verified.
+              4. Be flexible: screenshots of apps, photos of physical objects, or progress logs are all valid evidence if they logically relate to the task.
+
+              Return ONLY a JSON object:
               {
-                type: "text",
-                text: `You are a mission auditor. Analyze the provided image. 
-                       Does it prove completion of the task: "${taskDescription}"? 
-                       Return ONLY a JSON object with "verified" (boolean) and "reason" (string).`
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64Image}`
-                }
+                "verified": boolean,
+                "reason": "Short explanation of the visual match"
+              }`
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Image}`
               }
-            ]
+            }
+          ]
           }
         ],
         response_format: { type: "json_object" },

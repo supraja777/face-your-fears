@@ -8,6 +8,7 @@ interface ChallengeLogFormProps {
 }
 
 const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFormProps) => {
+  console.log("What is the description ", description)
   const [notes, setNotes] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
