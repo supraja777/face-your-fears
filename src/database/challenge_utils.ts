@@ -108,33 +108,77 @@ export const uploadToCloudinary = async (base64Image: string): Promise<string | 
   }
 };
 
+// export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
+//   console.log("Adding photo to dbbbbbbbbbbbbbbbbbb ", challengeId, newPhotoUrl)
+//   try {
+//     // 1. Fetch current photos first (if your DB doesn't support atomic append)
+//     const { data: challenge } = await supabase
+//       .from('challenges')
+//       .select('photos')
+//       .eq('id', challengeId)
+//       .single();
+
+//     const updatedPhotos = [...(challenge.photos || []), {
+//       url: newPhotoUrl,
+//     }];
+
+//     // 2. Update the record
+//     const { error } = await supabase
+//       .from('challenges')
+//       .update({ 
+//         photos: updatedPhotos,
+//         streak: challenge.streak + 1, // Usually you increment streak here to
+//       })
+//       .eq('id', challengeId);
+
+//     if (error) throw error;
+//     return true;
+//   } catch (error) {
+//     console.error("Error appending photo:", error);
+//     return false;
+//   }
+// };
+
+
 export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
-  console.log("Adding photo to dbbbbbbbbbbbbbbbbbb ", challengeId, newPhotoUrl)
+  console.log("Adding photo to DB (Prepend + Limit 6):", challengeId, newPhotoUrl);
+  
   try {
-    // 1. Fetch current photos first (if your DB doesn't support atomic append)
-    const { data: challenge } = await supabase
+    // 1. Fetch current photos AND current streak
+    const { data: challenge, error: fetchError } = await supabase
       .from('challenges')
-      .select('photos')
+      .select('photos, streak') // Added streak here so we can increment it
       .eq('id', challengeId)
       .single();
 
-    const updatedPhotos = [...(challenge.photos || []), {
-      url: newPhotoUrl,
-    }];
+    if (fetchError) throw fetchError;
 
-    // 2. Update the record
-    const { error } = await supabase
+    // 2. Prepare the new array
+    const newEntry = {
+      url: newPhotoUrl,
+      notes: reflectionNotes || "",
+      timestamp: new Date().toISOString()
+    };
+
+    // PREPEND: Put newEntry first
+    // LIMIT: Keep only the first 6 items
+    const currentPhotos = challenge.photos || [];
+    const updatedPhotos = [newEntry, ...currentPhotos].slice(0, 6);
+
+    // 3. Update the record
+    const { error: updateError } = await supabase
       .from('challenges')
       .update({ 
         photos: updatedPhotos,
-        streak: challenge.streak + 1, // Usually you increment streak here to
+        streak: (challenge.streak || 0) + 1, 
       })
       .eq('id', challengeId);
 
-    if (error) throw error;
+    if (updateError) throw updateError;
+    
     return true;
   } catch (error) {
-    console.error("Error appending photo:", error);
+    console.error("Error updating challenge photos:", error);
     return false;
   }
 };
