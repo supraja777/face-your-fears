@@ -5,6 +5,7 @@ interface NavigationBarProps {
 }
 
 const NavigationBar = ({ user }: NavigationBarProps) => {
+
   return (
     <nav style={{
       height: '70px',

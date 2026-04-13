@@ -1,12 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
-// import * as dotenv from 'dotenv';
 
-// // Load variables from .env for terminal execution
-// dotenv.config();
+// 1. Get values safely
+const supabaseUrl = 
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) || 
+  "";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const supabaseAnonKey = 
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) || 
+  "";
 
-console.log("In supabase ts")
-// This is your connection instance
+console.log("In supabase ts");
+
+// 2. Validate (Optional but helpful)
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn("Supabase credentials not found. Check your .env file and restart your server.");
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

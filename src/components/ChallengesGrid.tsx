@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // Updated to match your Supabase schema
 interface Challenge {
@@ -16,6 +16,10 @@ interface ChallengesGridProps {
 
 const ChallengesGrid = ({ challenges, onSelect }: ChallengesGridProps) => {
   console.log("In challenge grid ", challenges);
+
+   useEffect(() => {
+     
+    }, [challenges]);
 
   return (
     <div style={{

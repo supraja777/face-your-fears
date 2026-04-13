@@ -6,37 +6,22 @@ import AddChallengeModal from "./AddChallengeModal";
 import { getChallengesByUserId } from "../database/challenge_utils"; // Import your utility
 
 interface LeftProps {
+  challenges: any[];
   user: any;
   selectedChallenge: any;
   setSelectedChallenge: (c: any) => void;
+  fetchChallenges: (c : any) => void;
 }
 
-export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }: LeftProps) => {
+export const LeftComponent = ({ challenges, user, selectedChallenge, setSelectedChallenge, fetchChallenges }: LeftProps) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const[loading, setLoading] = useState(false)
   
-  // Initialize with empty array since we are fetching from DB
-  const [challenges, setChallenges] = useState<any[]>([]);
-
   // --- FETCH DATA ON MOUNT ---
   useEffect(() => {
-    const fetchChallenges = async () => {
-      console.log("In left Component the user data is ", user)
-      if (user?.id) {
-        try {
-          setLoading(true);
-          const data = await getChallengesByUserId(user.id);
-          setChallenges(data || []);
-        } catch (error) {
-          console.error("Failed to load challenges:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchChallenges();
+    console.log("In use Effect user id ", user)
+    fetchChallenges("45a43e83-d65b-4dfc-af7a-821259632c52");
   }, [user]);
 
   const handleAddChallenge = (newChallengeData: { name: string; description: string; difficulty: string }) => {
@@ -48,7 +33,7 @@ export const LeftComponent = ({ user, selectedChallenge, setSelectedChallenge }:
       tags: [newChallengeData.difficulty] 
     };
     
-    setChallenges(prev => [newEntry, ...prev]);
+  
     setIsSuccessModalOpen(true);
   };
 

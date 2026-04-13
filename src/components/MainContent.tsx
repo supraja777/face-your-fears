@@ -1,22 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserProfile } from "../types/UserProfile";
 import ChallengeLogForm from "./ChallengeLogForm";
 import { LeftComponent } from "./LeftComponent";
 import MotivationComponent from "./MotivationComponent";
 
 interface MainContentProps {
-  user: UserProfile | null;
+  user: UserProfile | null; 
   activeChallenge: boolean | null;
   selectedChallenge: { 
+    id: string; // Ensure your object has an ID for DB updates
     name: string; 
     streak: number; 
-    challenge_description: string | null 
+    challenge_description: string | null ;
   } | null;
   setSelectedChallenge: (c: any | null) => void;
+  onRefresh: () => Promise<void>;
+  fetchChallenges: (c : any) => void;
 }
 
-const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainContentProps) => {
+const MainContent = ({ challenges, fetchChallenges, user, selectedChallenge, setSelectedChallenge, onRefresh }: MainContentProps) => {
   const isLogging = !!selectedChallenge;
+  const [evidenceGallery, setEvidenceGallery] = useState<any[]>([]);
+
+  const handleRefreshChallenges = async () => {
+    
+      await onRefresh();
+    
+  };
 
   return (
     <main style={{
@@ -39,6 +49,8 @@ const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainCont
       }}>
         <LeftComponent 
           user={user} 
+          challenges = {challenges}
+          fetchChallenges = {fetchChallenges}
           selectedChallenge={selectedChallenge} 
           setSelectedChallenge={setSelectedChallenge} 
         />
@@ -58,9 +70,12 @@ const MainContent = ({ user, selectedChallenge, setSelectedChallenge }: MainCont
       }}>
         {selectedChallenge ? (
           <ChallengeLogForm 
+            challengeId={selectedChallenge.id} // Added ID
             challengeName={selectedChallenge.name} 
             streak={selectedChallenge.streak} 
-            description={selectedChallenge.challenge_description} 
+            description={selectedChallenge.challenge_description}
+            setEvidenceGallery={setEvidenceGallery} // Pass setter
+            refreshChallenges={handleRefreshChallenges} // Pass refresh trigger
           />
         ) : (
           <MotivationComponent />

@@ -3,20 +3,39 @@ import { analyzeEvidenceWithGroq } from '../utils/groq_api_utils';
 import CongratulationsModal from './CongratulationsModal';
 import { isValidPhoto } from '../utils/verify_image';
 
+interface EvidenceItem {
+  url: string;
+  date: string;
+  notes: string;
+}
+
 interface ChallengeLogFormProps {
+  challengeId: string | null;
   challengeName: string | null;
   streak: number | null;
   description: string | null;
+  setEvidenceGallery: React.Dispatch<React.SetStateAction<EvidenceItem[]>>;
+  refreshChallenges: () => Promise<void>;
 }
 
-
-const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFormProps) => {
+const ChallengeLogForm = ({ 
+  challengeId, 
+  challengeName, 
+  streak, 
+  description, 
+  setEvidenceGallery, 
+  refreshChallenges 
+}: ChallengeLogFormProps) => {
   const [notes, setNotes] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [notification, setNotification] = useState<{ show: boolean; message: string; isSuccess: boolean }>({ show: false, message: '', isSuccess: false });
+  const [notification, setNotification] = useState<{ show: boolean; message: string; isSuccess: boolean }>({ 
+    show: false, 
+    message: '', 
+    isSuccess: false 
+  });
 
   useEffect(() => {
     if (notification.show) {
@@ -50,35 +69,60 @@ const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFo
   };
 
   const handleSaveEntry = async () => {
-    if (!base64Image || !selectedImage) return;
+    if (!base64Image || !selectedImage || !challengeId) return;
     
     setIsAuditing(true);
     
-    // Call the helper function
-    const verified = await isValidPhoto(base64Image, description || "Task");
+    try {
+      // 1. AI Verification
+      const verified = await isValidPhoto(base64Image, description || "Task");
 
-    if (verified) {
+      if (verified) {
+        // 2. Prepare entry
+        const newEntry: EvidenceItem = {
+          url: selectedImage,
+          date: new Date().toISOString(),
+          notes: notes
+        };
 
+        // 3. TODO: Add your DB update call here
+        // await db.challenges.update(challengeId, { evidence: newEntry, streak: streak + 1 });
+
+        // 4. Update local gallery state
+        setEvidenceGallery(prev => [newEntry, ...prev]);
+
+        // 5. Re-fetch all challenges to update the global UI/Streak count
+        await refreshChallenges();
+
+        setNotification({ 
+          show: true, 
+          message: "Analysis done! Photo is valid ✨", 
+          isSuccess: true 
+        });
+        
+        setTimeout(() => setShowModal(true), 1000);
+      } else {
+        setNotification({ 
+          show: true, 
+          message: "Analysis done. Photo is not valid, try again.", 
+          isSuccess: false 
+        });
+      }
+    } catch (error) {
+      console.error("Save process failed:", error);
       setNotification({ 
         show: true, 
-        message: "Analysis done! Photo is valid ✨", 
-        isSuccess: true 
-      });
-      
-      setTimeout(() => setShowModal(true), 1000);
-    } else {
-      setNotification({ 
-        show: true, 
-        message: "Analysis done. Photo is not valid, try again.", 
+        message: "Something went wrong. Please try again.", 
         isSuccess: false 
       });
+    } finally {
+      setIsAuditing(false);
     }
-    
-    setIsAuditing(false);
   };
 
   return (
     <>
+      {/* Toast Notification */}
       <div style={{
         position: 'fixed', top: '30px', right: '30px', zIndex: 10000,
         backgroundColor: notification.isSuccess ? '#10b981' : '#f87171', color: 'white',
@@ -90,7 +134,7 @@ const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFo
         <span>{notification.isSuccess ? '✅' : '❌'}</span> {notification.message}
       </div>
 
-      {showModal && <CongratulationsModal isOpen = {showModal}  onClose={() => setShowModal(false)} />}
+      {showModal && <CongratulationsModal isOpen={showModal} onClose={() => setShowModal(false)} />}
 
       <div style={{
         backgroundColor: '#ffffff', borderRadius: '48px', padding: '48px', height: '820px', width: '100%',
@@ -136,7 +180,13 @@ const ChallengeLogForm = ({ challengeName, streak, description }: ChallengeLogFo
 
         <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
           <button onClick={handleSaveEntry} disabled={isAuditing}
-            style={{ width: '100%', padding: '22px', background: isAuditing ? '#e2e8f0' : 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', color: '#ffffff', border: 'none', borderRadius: '24px', fontWeight: '800', fontSize: '1.1rem', cursor: isAuditing ? 'not-allowed' : 'pointer', boxShadow: isAuditing ? 'none' : '0 10px 25px -5px rgba(79, 70, 229, 0.4)' }}>
+            style={{ 
+              width: '100%', padding: '22px', 
+              background: isAuditing ? '#e2e8f0' : 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 
+              color: '#ffffff', border: 'none', borderRadius: '24px', fontWeight: '800', fontSize: '1.1rem', 
+              cursor: isAuditing ? 'not-allowed' : 'pointer', 
+              boxShadow: isAuditing ? 'none' : '0 10px 25px -5px rgba(79, 70, 229, 0.4)' 
+            }}>
             {isAuditing ? "✨ Verifying..." : "Complete Mission"}
           </button>
         </div>

@@ -55,7 +55,7 @@ export async function getChallengesByUserId(userId: string) {
             .eq('user_id', userId)
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) console.log("Error while fecthing challenge ", error);
 
         console.log(`📂 Fetched ${challenges.length} challenges.`);
         return challenges;
@@ -64,3 +64,52 @@ export async function getChallengesByUserId(userId: string) {
         throw error;
     }
 }
+
+// Using a standard async fetch or DB client (like Supabase)
+export const getChallengeData = async (userId) => {
+  try {
+    const { data, error } = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('user_id', userId); // Filters rows where user_id matches
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching challenge data:", error);
+    return [];
+  }
+};
+
+export const addPhotoToChallenge = async (challengeId, newPhotoUrl, reflectionNotes) => {
+  try {
+    // 1. Fetch current photos first (if your DB doesn't support atomic append)
+    const { data: challenge } = await supabase
+      .from('challenges')
+      .select('photos')
+      .eq('id', challengeId)
+      .single();
+
+    const updatedPhotos = [...(challenge.photos || []), {
+      url: newPhotoUrl,
+      notes: reflectionNotes,
+      timestamp: new Date().toISOString()
+    }];
+
+    // 2. Update the record
+    const { error } = await supabase
+      .from('challenges')
+      .update({ 
+        photos: updatedPhotos,
+        streak: challenge.streak + 1, // Usually you increment streak here too
+        last_logged: new Date().toISOString()
+      })
+      .eq('id', challengeId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error appending photo:", error);
+    return false;
+  }
+};
